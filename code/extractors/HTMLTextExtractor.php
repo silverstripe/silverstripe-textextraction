@@ -6,6 +6,11 @@
  *
  */
 class HTMLTextExtractor extends FileTextExtractor {
+	
+	function isAvailable() {
+		return true;	
+	}
+
 	function supportedExtensions() {
 		return array("html", "htm", "xhtml");
 	}

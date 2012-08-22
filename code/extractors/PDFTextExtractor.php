@@ -6,6 +6,12 @@
  *
  */
 class PDFTextExtractor extends FileTextExtractor {
+
+	function isAvailable() {
+		$bin = $this->bin('pdftotext');
+		return (file_exists($bin) && is_executable($bin));
+	}
+	
 	function supportedExtensions() {
 		return array("pdf");
 	}
