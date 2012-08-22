@@ -9,7 +9,7 @@
  * @author mstephens
  *
  */
-class FileTextExtractable extends DataObjectDecorator {
+class FileTextExtractable extends DataExtension {
 	
 	static $db = array(
 		'FileContentCache' => 'Text'
