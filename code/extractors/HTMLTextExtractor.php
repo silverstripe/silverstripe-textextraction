@@ -16,9 +16,8 @@ class HTMLTextExtractor extends FileTextExtractor {
 	 */
 	public static $priority = 10;
 
-	function getContent($file) {
-		$filename = Director::baseFolder() . "/" . $file->Filename;
-		$content = file_get_contents($filename);
+	function getContent($path) {
+		$content = file_get_contents($path);
 		return strip_tags($content);
 	}
 }

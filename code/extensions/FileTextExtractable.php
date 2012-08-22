@@ -27,10 +27,10 @@ class FileTextExtractable extends DataExtension {
 		if (!$forceParse && $this->owner->FileContentCache) return $this->owner->FileContentCache;
 
 		// Determine which extractor can process this file.
-		$extractor = FileTextExtractor::for_file($this->owner);
+		$extractor = FileTextExtractor::for_file($this->owner->FullPath);
 		if (!$extractor) return null;
 
-		$text = $extractor->getContent($this->owner);
+		$text = $extractor->getContent($this->owner->FullPath);
 		if (!$text) return null;
 
 		$this->owner->FileContentCache = $text;

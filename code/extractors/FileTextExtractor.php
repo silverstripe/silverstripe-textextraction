@@ -17,11 +17,11 @@ abstract class FileTextExtractor extends Object {
 	protected static $sorted_extractor_classes = null;
 
 	/**
-	 * @param  DataObject $file
+	 * @param  String $path
 	 * @return FileTextExtractor
 	 */
-	static function for_file($file) {
-		$extension = strtolower($file->getExtension());
+	static function for_file($path) {
+		$extension = pathinfo($path, PATHINFO_EXTENSION);
 
 		if (!self::$sorted_extractor_classes) {
 			// Generate the sorted list of extractors on demand.
@@ -42,17 +42,26 @@ abstract class FileTextExtractor extends Object {
 	}
 
 	/**
+	 * Checks if the extractor is supported on the current environment,
+	 * for example if the correct binaries or libraries are available.
+	 * 
+	 * @return boolean
+	 */
+	abstract function isAvailable();
+
+	/**
 	 * Return an array of content types that the extractor can handle.
 	 * @return unknown_type
 	 */
 	abstract function supportedExtensions();
 
 	/**
-	 * Given a file object, extract the contents as text
-	 * @param $file
+	 * Given a file path, extract the contents as text.
+	 * 
+	 * @param $path
 	 * @return unknown_type
 	 */
-	abstract function getContent($file);
+	abstract function getContent($path);
 }
 
 ?>

@@ -24,10 +24,9 @@ class PDFTextExtractor extends FileTextExtractor {
 		return ( $path ? $path . '/' : '' ) . $prog;
 	}
 	
-	function getContent($file) {
-		$filename = Director::baseFolder() . "/" . $file->Filename;
-		if (!$filename) return ""; // no file
-		$content = `{$this->bin('pdftotext')} "$filename" -`;
+	function getContent($path) {
+		if (!$path) return ""; // no file
+		$content = `{$this->bin('pdftotext')} "$path" -`;
 		return $content;
 	}
 }
