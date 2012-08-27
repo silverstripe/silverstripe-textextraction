@@ -64,4 +64,4 @@ abstract class FileTextExtractor extends Object {
 	abstract function getContent($path);
 }
 
-?>
+class FileTextExtractor_Exception extends Exception {}

@@ -32,8 +32,15 @@ class PDFTextExtractor extends FileTextExtractor {
 	
 	function getContent($path) {
 		if (!$path) return ""; // no file
-		$content = `{$this->bin('pdftotext')} "$path" -`;
-		return $content;
+		exec(sprintf('%s "%s" - 2>&1', $this->bin('pdftotext'), $path), $content, $err);
+		if($err) {
+			throw new FileTextExtractor_Exception(sprintf(
+				'PDFTextExtractor->getContent() failed for %s: %s',
+				$path,
+				implode('', $err)
+			));
+		}
+		return implode('', $content);
 	}
 }
 
