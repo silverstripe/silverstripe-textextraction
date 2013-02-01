@@ -35,9 +35,10 @@ abstract class FileTextExtractor extends Object {
 		}
 		foreach(self::$sorted_extractor_classes as $className => $priority) {
 			$formatter = new $className();
-			if(in_array($extension, $formatter->supportedExtensions())) {
-				return $formatter;
-			}
+			$matched = array_filter($formatter->supportedExtensions(), function($compare) use($extension) {
+				return (strtolower($compare) == strtolower($extension));
+			});
+			if($matched) return $formatter;
 		}
 	}
 
