@@ -15,14 +15,79 @@ Note: Previously part of the [sphinx module](https://github.com/silverstripe/sil
 
  * SilverStripe 3.0
  * (optional) [XPDF](http://www.foolabs.com/xpdf/) (`pdftotext` utility)
+ * (optional) [Apache Solr with ExtracingRequestHandler](http://wiki.apache.org/solr/ExtractingRequestHandler)
+
+### Supported Formats
+
+ * HTML (built-in)
+ * PDF (with XPDF or Solr)
+ * Microsoft Word, Excel, Powerpoint (Solr)
+ * OpenOffice (Solr)
+ * CSV (Solr)
+ * RTF (Solr)
+ * EPub (Solr)
+
+## Installation
+
+The recommended installation is through [composer](http://getcomposer.org).
+Add the following to your `composer.json`:
+
+	:::js
+	{
+		"require": {
+			"silverstripe/textextraction": "*"
+		}
+	}
+
+The module depends on the [Guzzle HTTP Library](http://guzzlephp.org),
+which is automatically checked out by composer. Alternatively, install Guzzle
+through PEAR and ensure its in your `include_path`.
 
 ## Configuration
 
-No configuration is required, unless you want to make
+### Basic
+
+By default, only extraction from HTML documents is supported.
+No configuration is required for that, unless you want to make
 the content available through your `DataObject` subclass.
 In this case, add the following to `mysite/_config.php`:
 
 	DataObject::add_extension('File', 'FileTextExtractable');
+
+### XPDF
+
+PDFs require special handling, for example through the [XPDF](http://www.foolabs.com/xpdf/)
+commandline utility. Follow their installation instructions, its presence will be automatically
+detected. You can optionally set the binary path in `mysite/_config/config.yml`:
+
+	:::yml
+	PDFTextExtractor:
+		binary_location: /my/path/pdftotext
+
+### Apache Solr
+
+Apache Solr is a fulltext search engine, an aspect which is often used
+alongside this module. But more importantly for us, it has bindings to [Apache Tika](http://tika.apache.org/)
+through the [ExtractingRequestHandler](http://wiki.apache.org/solr/ExtractingRequestHandler) interface.
+This allows Solr to inspect the contents of various file formats, such as Office documents and PDF files.
+The textextraction module retrieves the output of this service, rather than altering the index.
+With the raw text output, you can decide to store it in a database column for fulltext search
+in your database driver, or even pass it back to Solr as part of a full index update.
+
+In order to use Solr, you need to configure a URL for it (in `mysite/_config/config.yml`):
+
+	SolrCellTextExtractor:
+		base_url: 'http://localhost:8983/solr/update/extract'
+
+Note that in case you're using multiple cores, you'll need to add the core name to the URL 
+(e.g. 'http://localhost:8983/solr/PageSolrIndex/update/extract').
+The ["fulltext" module](https://github.com/silverstripe-labs/silverstripe-fulltextsearch)
+uses multiple cores by default, and comes prepackaged with a Solr server.
+Its a stripped-down version of Solr, follow the module README on how to add
+Apache Tika text extraction capabilities.
+
+Note: This isn't a terribly efficient way to process large amounts of files, since 
+each HTTP request is run synchronously.
 
 ## Usage
 
