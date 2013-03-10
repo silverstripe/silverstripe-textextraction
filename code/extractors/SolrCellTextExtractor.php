@@ -55,7 +55,7 @@ class SolrCellTextExtractor extends FileTextExtractor {
 		$response = $request->send();
 		// Use preg match to avoid SimpleXML running out of memory on large text nodes
 		preg_match(
-			sprintf('/\<str name\="%s"\>(.*)\<\/str\>/s', preg_quote($fileName)),
+			sprintf('/\<str name\="%s"\>(.*?)\<\/str\>/s', preg_quote($fileName)),
 			(string)$response->getBody(), 
 			$matches
 		);
