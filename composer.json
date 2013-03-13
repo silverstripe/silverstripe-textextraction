@@ -1,7 +1,7 @@
 {
 	"name": "silverstripe/textextraction",
 	"type": "silverstripe-module",
-	"description": "Calendar for SilverStripe CMS",
+	"description": "Text Extraction API for SilverStripe CMS (mostly used with 'fulltextsearch' module)",
 	"homepage": "http://silverstripe.org",
 	"license": "BSD-3-Clause",
 	"keywords": ["silverstripe", "fulltext", "pdf"],
