@@ -11,7 +11,7 @@ class FileTextExtractableTest extends SapphireTest {
 			'Name' => 'test1.html',
 			'Filename' => 'textextraction/tests/fixtures/test1.html'
 		));
-		$file->write();
+		// Don't write file, since it'd rename the file and make it inaccessible for subsequent tests
 
 		$content = $file->extractFileAsText();
 		$this->assertContains('Test Headline', $content);
