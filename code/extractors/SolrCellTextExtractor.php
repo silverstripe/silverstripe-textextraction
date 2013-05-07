@@ -23,6 +23,9 @@ class SolrCellTextExtractor extends FileTextExtractor {
 	protected $httpClient;
 
 	public function getHttpClient() {
+		if(!$this->config()->get('base_url')) {
+			throw new InvalidArgumentException('SolrCellTextExtractor.base_url not specified');
+		}
 		if(!$this->httpClient) $this->httpClient = new Client($this->config()->get('base_url'));
 		return $this->httpClient;
 	}
@@ -53,16 +56,30 @@ class SolrCellTextExtractor extends FileTextExtractor {
 		
 		$fileName = basename($path);
 		$client = $this->getHttpClient();
-		$request = $client
-			->post('?extractOnly=true&extractFormat=text')
-			->addPostFiles(array('myfile' => $path));
-		$response = $request->send();
+		try {
+			$request = $client
+				->post()
+				->addPostFields(array('extractOnly' => 'true', 'extractFormat' => 'text'))
+				->addPostFiles(array('myfile' => $path));
+			$response = $request->send();
+		} catch(InvalidArgumentException $e) {
+			SS_Log::log(
+				sprintf(
+					'Error extracting text from "%s" (message: %s)', 
+					$path, 
+					$e->getMessage()
+				),
+				SS_Log::NOTICE
+			);
+			return null;
+		}
 		// Use preg match to avoid SimpleXML running out of memory on large text nodes
 		preg_match(
 			sprintf('/\<str name\="%s"\>(.*?)\<\/str\>/s', preg_quote($fileName)),
 			(string)$response->getBody(), 
 			$matches
 		);
+
 		return $matches ? $matches[1] : null;
 	}
 }
