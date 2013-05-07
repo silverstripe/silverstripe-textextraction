@@ -12,9 +12,13 @@ use Guzzle\Http\Client;
  */
 class SolrCellTextExtractor extends FileTextExtractor {
 
-	public static $base_url;
+	/**
+	 * @config
+	 * @var [type]
+	 */
+	private static $base_url;
 
-	public static $priority = 75;
+	private static $priority = 75;
 
 	protected $httpClient;
 

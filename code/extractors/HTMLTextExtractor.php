@@ -18,7 +18,7 @@ class HTMLTextExtractor extends FileTextExtractor {
 	/**
 	 * Lower priority because its not the most clever HTML extraction. If there is something better, use it
 	 */
-	public static $priority = 10;
+	private static $priority = 10;
 
 	/**
 	 * Extracts content from regex, by using strip_tags()

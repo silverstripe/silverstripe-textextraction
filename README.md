@@ -13,7 +13,7 @@ Note: Previously part of the [sphinx module](https://github.com/silverstripe/sil
 
 ## Requirements
 
- * SilverStripe 3.0
+ * SilverStripe 3.1
  * (optional) [XPDF](http://www.foolabs.com/xpdf/) (`pdftotext` utility)
  * (optional) [Apache Solr with ExtracingRequestHandler](http://wiki.apache.org/solr/ExtractingRequestHandler)
 

@@ -10,9 +10,10 @@ abstract class FileTextExtractor extends Object {
 	 * Set priority from 0-100.
 	 * The highest priority extractor for a given content type will be selected.
 	 *
+	 * @config
 	 * @var int
 	 */
-	public static $priority = 50;
+	private static $priority = 50;
 
 	protected static $sorted_extractor_classes = null;
 
@@ -28,7 +29,7 @@ abstract class FileTextExtractor extends Object {
 			$classes = ClassInfo::subclassesFor("FileTextExtractor");
 			array_shift($classes);
 			$sortedClasses = array();
-			foreach($classes as $class) $sortedClasses[$class] = Object::get_static($class, 'priority');
+			foreach($classes as $class) $sortedClasses[$class] = Config::inst()->get($class, 'priority');
 			arsort($sortedClasses);
 
 			self::$sorted_extractor_classes = $sortedClasses;
