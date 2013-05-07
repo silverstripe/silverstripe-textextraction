@@ -11,7 +11,7 @@
  */
 class FileTextExtractable extends DataExtension {
 	
-	static $db = array(
+	private static $db = array(
 		'FileContentCache' => 'Text'
 	);
 
