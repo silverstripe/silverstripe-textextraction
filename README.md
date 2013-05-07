@@ -32,12 +32,13 @@ Note: Previously part of the [sphinx module](https://github.com/silverstripe/sil
 The recommended installation is through [composer](http://getcomposer.org).
 Add the following to your `composer.json`:
 
-	:::js
+	```js
 	{
 		"require": {
 			"silverstripe/textextraction": "*"
 		}
 	}
+	```
 
 The module depends on the [Guzzle HTTP Library](http://guzzlephp.org),
 which is automatically checked out by composer. Alternatively, install Guzzle
@@ -60,9 +61,10 @@ PDFs require special handling, for example through the [XPDF](http://www.foolabs
 commandline utility. Follow their installation instructions, its presence will be automatically
 detected. You can optionally set the binary path in `mysite/_config/config.yml`:
 
-	:::yml
+	```yml
 	PDFTextExtractor:
 		binary_location: /my/path/pdftotext
+	```
 
 ### Apache Solr
 
@@ -76,8 +78,10 @@ in your database driver, or even pass it back to Solr as part of a full index up
 
 In order to use Solr, you need to configure a URL for it (in `mysite/_config/config.yml`):
 
+	```yml
 	SolrCellTextExtractor:
 		base_url: 'http://localhost:8983/solr/update/extract'
+	```
 
 Note that in case you're using multiple cores, you'll need to add the core name to the URL 
 (e.g. 'http://localhost:8983/solr/PageSolrIndex/update/extract').
@@ -85,6 +89,27 @@ The ["fulltext" module](https://github.com/silverstripe-labs/silverstripe-fullte
 uses multiple cores by default, and comes prepackaged with a Solr server.
 Its a stripped-down version of Solr, follow the module README on how to add
 Apache Tika text extraction capabilities.
+
+You need to ensure that some indexable property on your object
+returns the contents, either by directly accessing `FileTextExtractable->extractFileAsText()`,
+or by writing your own method around `FileTextExtractor->getContent()` (see "Usage" below).
+The property should be listed in your `SolrIndex` subclass, e.g. as follows:
+
+	```php
+	class MyDocument extends DataObject {
+		static $db = array('Path' => 'Text');
+		function getContent() {
+			$extractor = FileTextExtractor::for_file($this->Path);
+			return $extractor ? $extractor->getContent($this->Path) : null;		
+		}
+	}
+	class NZQASolrIndex extends SolrIndex {
+		function init() {
+			$this->addClass('MyDocument');
+			$this->addFulltextField('Content', 'HTMLText');
+		}
+	}
+	```
 
 Note: This isn't a terribly efficient way to process large amounts of files, since 
 each HTTP request is run synchronously.
@@ -97,7 +122,7 @@ Manual extraction:
 	$extractor = FileTextExtractor::for_file($myFile);
 	$content = $extractor->getContent($myFile);
 
-DataObject extraction:
+Extraction with `FileTextExtractable` extension applied:
 
 	$myFileObj = File::get()->First();
 	$content = $myFileObj->extractFileAsText();
