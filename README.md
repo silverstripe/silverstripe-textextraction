@@ -1,5 +1,7 @@
 # Text Extraction Module
 
+[![Build Status](https://secure.travis-ci.org/silverstripe-labs/silverstripe-textextraction.png)](http://travis-ci.org/silverstripe-labs/silverstripe-textextraction)
+
 ## Overview
 
 Provides an extraction API for file content, which can hook into different extractor
