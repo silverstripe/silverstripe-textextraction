@@ -105,7 +105,7 @@ The property should be listed in your `SolrIndex` subclass, e.g. as follows:
 			return $extractor ? $extractor->getContent($this->Path) : null;		
 		}
 	}
-	class NZQASolrIndex extends SolrIndex {
+	class MySolrIndex extends SolrIndex {
 		function init() {
 			$this->addClass('MyDocument');
 			$this->addFulltextField('Content', 'HTMLText');
