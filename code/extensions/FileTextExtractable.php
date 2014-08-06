@@ -28,7 +28,7 @@ class FileTextExtractable extends DataExtension {
 
 		// Determine which extractor can process this file.
 		$extractor = FileTextExtractor::for_file($this->owner->FullPath);
-		if (!$extractor) return null;
+		if (!$extractor || !$extractor->isAvailable()) return null;
 
 		$text = $extractor->getContent($this->owner->FullPath);
 		if (!$text) return null;
