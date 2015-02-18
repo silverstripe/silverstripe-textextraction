@@ -13,8 +13,11 @@ use Guzzle\Http\Client;
 class SolrCellTextExtractor extends FileTextExtractor {
 
 	/**
+	 * Base URL to use for solr text extraction.
+	 * E.g. http://localhost:8983/solr/update/extract
+	 *
 	 * @config
-	 * @var [type]
+	 * @var string
 	 */
 	private static $base_url;
 
@@ -38,17 +41,21 @@ class SolrCellTextExtractor extends FileTextExtractor {
 		$url = $this->config()->get('base_url');
 		if(!$url) return false;
 	}
-	
-	/**
-	 * @see  http://tika.apache.org/1.3/formats.html
-	 * @return Array
-	 */
-	public function supportedExtensions() {
-		return array(
-			'pdf', 'doc', 'docx', 'xls', 'xlsx',
-			'epub', 'rtf', 'odt', 'fodt', 'ods', 'fods',
-			'ppt', 'pptx', 'odp', 'fodp', 'csv'
+
+	public function supportsExtension($extension) {
+		return in_array(
+			strtolower($extension),
+			array(
+				'pdf', 'doc', 'docx', 'xls', 'xlsx',
+				'epub', 'rtf', 'odt', 'fodt', 'ods', 'fods',
+				'ppt', 'pptx', 'odp', 'fodp', 'csv'
+			)
 		);
+	}
+
+	public function supportsMime($mime) {
+		// Rely on supportsExtension
+		return false;
 	}
 	
 	public function getContent($path) {

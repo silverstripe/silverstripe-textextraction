@@ -18,7 +18,18 @@
 	"require": {
 		"php": ">=5.3.2",
 		"composer/installers": "*",
-		"silverstripe/framework": "~3.0",
+		"silverstripe/framework": "~3.1",
 		"guzzle/http": "*"
+	},
+	"require-dev": {
+		"phpunit/PHPUnit": "~3.7@stable"
+	},
+	"suggest": {
+		"ext-fileinfo": "Improved support for file mime detection"
+	},
+	"extra": {
+		"branch-alias": {
+			"dev-master": "2.0.x-dev"
+		}
 	}
 }
