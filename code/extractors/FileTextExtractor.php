@@ -6,40 +6,89 @@
  *
  */
 abstract class FileTextExtractor extends Object {
+
 	/**
 	 * Set priority from 0-100.
 	 * The highest priority extractor for a given content type will be selected.
 	 *
 	 * @config
-	 * @var int
+	 * @var integer
 	 */
 	private static $priority = 50;
 
+	/**
+	 * Cache of extractor class names, sorted by priority
+	 *
+	 * @var array
+	 */
 	protected static $sorted_extractor_classes = null;
 
 	/**
-	 * @param  String $path
+	 * Gets the list of prioritised extractor classes
+	 *
+	 * @return array
+	 */
+	protected static function get_extractor_classes() {
+		// Check cache
+		if (self::$sorted_extractor_classes) return self::$sorted_extractor_classes;
+		
+		// Generate the sorted list of extractors on demand.
+		$classes = ClassInfo::subclassesFor("FileTextExtractor");
+		array_shift($classes);
+		foreach($classes as $class) $classes[$class] = Config::inst()->get($class, 'priority');
+		arsort($classes);
+
+		// Save classes
+		$sortedClasses = array_keys($classes);
+		return self::$sorted_extractor_classes = $sortedClasses;
+	}
+
+	/**
+	 * Get the text file extractor for the given class
+	 *
+	 * @param string $class
+	 * @return FileTextExtractor
+	 */
+	protected static function get_extractor($class) {
+		return Injector::inst()->get($class);
+	}
+
+	/**
+	 * Attempt to detect mime type for given file
+	 *
+	 * @param string $path
+	 * @return string Mime type if found
+	 */
+	protected static function get_mime($path) {
+		if(!class_exists('finfo')) return null;
+
+		// Check mime of file
+		$finfo = new finfo(FILEINFO_MIME_TYPE);
+		return $finfo->file($path);
+	}
+
+	/**
+	 * @param string $path
 	 * @return FileTextExtractor
 	 */
 	static function for_file($path) {
 		$extension = pathinfo($path, PATHINFO_EXTENSION);
+		$mime = self::get_mime($path);
+		foreach(self::get_extractor_classes() as $className) {
+			$extractor = self::get_extractor($className);
 
-		if (!self::$sorted_extractor_classes) {
-			// Generate the sorted list of extractors on demand.
-			$classes = ClassInfo::subclassesFor("FileTextExtractor");
-			array_shift($classes);
-			$sortedClasses = array();
-			foreach($classes as $class) $sortedClasses[$class] = Config::inst()->get($class, 'priority');
-			arsort($sortedClasses);
+			// Skip unavailable extractors
+			if(!$extractor->isAvailable()) continue;
 
-			self::$sorted_extractor_classes = $sortedClasses;
-		}
-		foreach(self::$sorted_extractor_classes as $className => $priority) {
-			$formatter = new $className();
-			$matched = array_filter($formatter->supportedExtensions(), function($compare) use($extension) {
-				return (strtolower($compare) == strtolower($extension));
-			});
-			if($matched) return $formatter;
+			// Check extension
+			if($extension && $extractor->supportsExtension($extension)) {
+				return $extractor;
+			}
+
+			// Check mime
+			if($mime && $extractor->supportsMime($mime)) {
+				return $extractor;
+			}
 		}
 	}
 
@@ -49,21 +98,33 @@ abstract class FileTextExtractor extends Object {
 	 * 
 	 * @return boolean
 	 */
-	abstract function isAvailable();
+	abstract public function isAvailable();
 
 	/**
-	 * Return an array of content types that the extractor can handle.
-	 * @return unknown_type
+	 * Determine if this extractor supports the given extension.
+	 * If support is determined by mime/type only, then this should return false.
+	 *
+	 * @param string $extension
+	 * @return boolean
 	 */
-	abstract function supportedExtensions();
+	abstract public function supportsExtension($extension);
+
+	/**
+	 * Determine if this extractor suports the given mime type.
+	 * Will only be called if supportsExtension returns false.
+	 * 
+	 * @param string $mime
+	 * @return boolean
+	 */
+	abstract public function supportsMime($mime);
 
 	/**
 	 * Given a file path, extract the contents as text.
 	 * 
-	 * @param $path
-	 * @return unknown_type
+	 * @param string $path
+	 * @return string
 	 */
-	abstract function getContent($path);
+	abstract public function getContent($path);
 }
 
 class FileTextExtractor_Exception extends Exception {}

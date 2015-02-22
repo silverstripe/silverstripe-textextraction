@@ -15,16 +15,29 @@ class FileTextExtractable extends DataExtension {
 		'FileContentCache' => 'Text'
 	);
 
+	private static $casting = array(
+		'FileContent' => 'Text'
+	);
+
+	/**
+	 * Helper function for template
+	 *
+	 * @return string
+	 */
+	public function getFileContent() {
+		return $this->extractFileAsText();
+	}
+
 	/**
 	 * Tries to parse the file contents if a FileTextExtractor class exists to handle the file type, and returns the text.
 	 * The value is also cached into the File record itself.
 	 * 
-	 * @param $forceParse		If false, the file content is only parsed on demand. If true, the content parsing is forced, bypassing the
-	 * 	cached version
-	 * @return String
+	 * @param boolean $disableCache If false, the file content is only parsed on demand.
+	 * If true, the content parsing is forced, bypassing the cached version
+	 * @return string
 	 */
-	function extractFileAsText($forceParse = false) {
-		if (!$forceParse && $this->owner->FileContentCache) return $this->owner->FileContentCache;
+	public function extractFileAsText($disableCache = false) {
+		if (!$disableCache && $this->owner->FileContentCache) return $this->owner->FileContentCache;
 
 		// Determine which extractor can process this file.
 		$extractor = FileTextExtractor::for_file($this->owner->FullPath);
@@ -39,5 +52,3 @@ class FileTextExtractable extends DataExtension {
 		return $text;
 	}
 }
-
-?>

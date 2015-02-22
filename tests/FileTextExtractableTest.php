@@ -5,6 +5,20 @@ class FileTextExtractableTest extends SapphireTest {
 		'File' => array('FileTextExtractable')
 	);
 
+	public function setUp() {
+		parent::setUp();
+
+		// Ensure that html is a valid extension
+		Config::inst()
+			->nest()
+			->update('File', 'allowed_extensions', array('html'));
+	}
+
+	public function tearDown() {
+		Config::unnest();
+		parent::tearDown();
+	}
+
 	function testExtractFileAsText() {
 		// Create a copy of the file, as it may be clobbered by the test
 		// ($file->extractFileAsText() calls $file->write)

@@ -7,16 +7,26 @@
  */
 class HTMLTextExtractor extends FileTextExtractor {
 	
-	function isAvailable() {
-		return true;	
+	public function isAvailable() {
+		return true;
 	}
 
-	function supportedExtensions() {
-		return array("html", "htm", "xhtml");
+	public function supportsExtension($extension) {
+		return in_array(
+			strtolower($extension),
+			array("html", "htm", "xhtml")
+		);
+	}
+
+	public function supportsMime($mime) {
+		return strtolower($mime) === 'text/html';
 	}
 
 	/**
 	 * Lower priority because its not the most clever HTML extraction. If there is something better, use it
+	 *
+	 * @config
+	 * @var integer
 	 */
 	private static $priority = 10;
 
@@ -25,10 +35,10 @@ class HTMLTextExtractor extends FileTextExtractor {
 	 * combined with regular expressions to remove non-content tags like <style> or <script>,
 	 * as well as adding line breaks after block tags.
 	 * 
-	 * @param  [type] $path [description]
-	 * @return [type]       [description]
+	 * @param string $path
+	 * @return string
 	 */
-	function getContent($path) {
+	public function getContent($path) {
 		$content = file_get_contents($path);
 		// Yes, yes, regex'ing HTML is evil.
 		// Since we don't care about well-formedness or markup here, it does the job.
@@ -61,5 +71,3 @@ class HTMLTextExtractor extends FileTextExtractor {
 		return strip_tags($content);
 	}
 }
-
-?>

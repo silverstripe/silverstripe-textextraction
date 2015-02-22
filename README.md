@@ -18,6 +18,7 @@ Note: Previously part of the [sphinx module](https://github.com/silverstripe/sil
  * SilverStripe 3.1
  * (optional) [XPDF](http://www.foolabs.com/xpdf/) (`pdftotext` utility)
  * (optional) [Apache Solr with ExtracingRequestHandler](http://wiki.apache.org/solr/ExtractingRequestHandler)
+ * (optional) [Apache Tika](http://tika.apache.org/)
 
 ### Supported Formats
 
@@ -28,6 +29,7 @@ Note: Previously part of the [sphinx module](https://github.com/silverstripe/sil
  * CSV (Solr)
  * RTF (Solr)
  * EPub (Solr)
+ * Many others (Tika)
 
 ## Installation
 
@@ -37,7 +39,7 @@ Add the following to your `composer.json`:
 	```js
 	{
 		"require": {
-			"silverstripe/textextraction": "*"
+			"silverstripe/textextraction": "2.0.x-dev"
 		}
 	}
 	```
@@ -53,9 +55,13 @@ through PEAR and ensure its in your `include_path`.
 By default, only extraction from HTML documents is supported.
 No configuration is required for that, unless you want to make
 the content available through your `DataObject` subclass.
-In this case, add the following to `mysite/_config.php`:
+In this case, add the following to `mysite/_config/config.yml`:
 
-	DataObject::add_extension('File', 'FileTextExtractable');
+	```yaml
+	File:
+	  extensions:
+	    - FileTextExtractable
+	```
 
 ### XPDF
 
@@ -108,13 +114,23 @@ The property should be listed in your `SolrIndex` subclass, e.g. as follows:
 	class MySolrIndex extends SolrIndex {
 		function init() {
 			$this->addClass('MyDocument');
-			$this->addFulltextField('Content', 'HTMLText');
+			$this->addStoredField('Content', 'HTMLText');
 		}
 	}
 	```
 
 Note: This isn't a terribly efficient way to process large amounts of files, since 
 each HTTP request is run synchronously.
+
+### Tika
+
+Support for Apache Tika (1.7 and above) is included for the standalone command line utility.
+
+See [the Apache Tika home page](http://tika.apache.org/1.7/index.html) for instructions on installing and
+configuring this.
+
+This extension will best work with the [fileinfo PHP extension](http://php.net/manual/en/book.fileinfo.php)
+installed to perform mime detection. Tika validates support via mime type rather than file extensions.
 
 ## Usage
 
