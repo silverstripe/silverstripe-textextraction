@@ -8,15 +8,6 @@
 class TikaTextExtractor extends FileTextExtractor {
 
 	/**
-	 * Text extraction locale. Use {locale} as a placeholder for the current locale, {default}
-	 * as the placeholder for the default locale
-	 *
-	 * @var string
-	 * @config
-	 */
-	private static $locale = '{default}.utf-8';
-
-	/**
 	 * Text extraction mode. Defaults to -t (plain text)
 	 *
 	 * @var string

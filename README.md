@@ -36,13 +36,13 @@ Note: Previously part of the [sphinx module](https://github.com/silverstripe/sil
 The recommended installation is through [composer](http://getcomposer.org).
 Add the following to your `composer.json`:
 
-	```js
-	{
-		"require": {
-			"silverstripe/textextraction": "2.0.x-dev"
-		}
+```js
+{
+	"require": {
+		"silverstripe/textextraction": "2.0.x-dev"
 	}
-	```
+}
+```
 
 The module depends on the [Guzzle HTTP Library](http://guzzlephp.org),
 which is automatically checked out by composer. Alternatively, install Guzzle
@@ -57,11 +57,11 @@ No configuration is required for that, unless you want to make
 the content available through your `DataObject` subclass.
 In this case, add the following to `mysite/_config/config.yml`:
 
-	```yaml
-	File:
-	  extensions:
-	    - FileTextExtractable
-	```
+```yaml
+File:
+  extensions:
+	- FileTextExtractable
+```
 
 ### XPDF
 
@@ -69,10 +69,10 @@ PDFs require special handling, for example through the [XPDF](http://www.foolabs
 commandline utility. Follow their installation instructions, its presence will be automatically
 detected. You can optionally set the binary path in `mysite/_config/config.yml`:
 
-	```yml
-	PDFTextExtractor:
-		binary_location: /my/path/pdftotext
-	```
+```yml
+PDFTextExtractor:
+	binary_location: /my/path/pdftotext
+```
 
 ### Apache Solr
 
@@ -86,10 +86,10 @@ in your database driver, or even pass it back to Solr as part of a full index up
 
 In order to use Solr, you need to configure a URL for it (in `mysite/_config/config.yml`):
 
-	```yml
-	SolrCellTextExtractor:
-		base_url: 'http://localhost:8983/solr/update/extract'
-	```
+```yml
+SolrCellTextExtractor:
+	base_url: 'http://localhost:8983/solr/update/extract'
+```
 
 Note that in case you're using multiple cores, you'll need to add the core name to the URL 
 (e.g. 'http://localhost:8983/solr/PageSolrIndex/update/extract').
@@ -103,28 +103,28 @@ returns the contents, either by directly accessing `FileTextExtractable->extract
 or by writing your own method around `FileTextExtractor->getContent()` (see "Usage" below).
 The property should be listed in your `SolrIndex` subclass, e.g. as follows:
 
-	```php
-	class MyDocument extends DataObject {
-		static $db = array('Path' => 'Text');
-		function getContent() {
-			$extractor = FileTextExtractor::for_file($this->Path);
-			return $extractor ? $extractor->getContent($this->Path) : null;		
-		}
+```php
+class MyDocument extends DataObject {
+	static $db = array('Path' => 'Text');
+	function getContent() {
+		$extractor = FileTextExtractor::for_file($this->Path);
+		return $extractor ? $extractor->getContent($this->Path) : null;		
 	}
-	class MySolrIndex extends SolrIndex {
-		function init() {
-			$this->addClass('MyDocument');
-			$this->addStoredField('Content', 'HTMLText');
-		}
+}
+class MySolrIndex extends SolrIndex {
+	function init() {
+		$this->addClass('MyDocument');
+		$this->addStoredField('Content', 'HTMLText');
 	}
-	```
+}
+```
 
 Note: This isn't a terribly efficient way to process large amounts of files, since 
 each HTTP request is run synchronously.
 
 ### Tika
 
-Support for Apache Tika (1.7 and above) is included for the standalone command line utility.
+Support for Apache Tika (1.7 and above) is included. This can be run in one of two ways: Server or CLI.
 
 See [the Apache Tika home page](http://tika.apache.org/1.7/index.html) for instructions on installing and
 configuring this.
@@ -132,15 +132,54 @@ configuring this.
 This extension will best work with the [fileinfo PHP extension](http://php.net/manual/en/book.fileinfo.php)
 installed to perform mime detection. Tika validates support via mime type rather than file extensions.
 
+### Tika - CLI
+
+Ensure that your machine has a 'tika' command available which will run the CLI script.
+
+```bash
+#!/bin/bash
+exec java -jar /usr/local/Cellar/tika/1.7/libexec/tika-app-1.7.jar "$@"
+```
+
+### Tika Rest Server
+
+Tika can also be run as a server.
+
+You can configure your server pointpoint either by the SS_TIKA_ENDPOINT define, or by setting the url via config.
+
+```yaml
+TikaServerTextExtractor:
+  server_endpoint: 'http://localhost:9998'
+```
+
+Alternatively this may be specified via the `SS_TIKA_ENDPOINT` directive in your `_ss_environment.php` file.
+
+
+Then startup your server as below
+
+```bash
+java -jar tika-server-1.7.jar --host=localhost --port=9998
+```
+
 ## Usage
 
 Manual extraction:
 
-	$myFile = '/my/path/myfile.pdf';
-	$extractor = FileTextExtractor::for_file($myFile);
-	$content = $extractor->getContent($myFile);
+```php
+$myFile = '/my/path/myfile.pdf';
+$extractor = FileTextExtractor::for_file($myFile);
+$content = $extractor->getContent($myFile);
+```
 
 Extraction with `FileTextExtractable` extension applied:
 
-	$myFileObj = File::get()->First();
-	$content = $myFileObj->extractFileAsText();
+```php
+$myFileObj = File::get()->First();
+$content = $myFileObj->getFileContent();
+```
+
+This content can also be embedded directly within a template.
+
+```
+$MyFile.FileContent
+```

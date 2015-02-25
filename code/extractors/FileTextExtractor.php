@@ -35,11 +35,14 @@ abstract class FileTextExtractor extends Object {
 		// Generate the sorted list of extractors on demand.
 		$classes = ClassInfo::subclassesFor("FileTextExtractor");
 		array_shift($classes);
-		foreach($classes as $class) $classes[$class] = Config::inst()->get($class, 'priority');
-		arsort($classes);
+		$classPriorities = array();
+		foreach($classes as $class) {
+			$classPriorities[$class] = Config::inst()->get($class, 'priority');
+		}
+		arsort($classPriorities);
 
 		// Save classes
-		$sortedClasses = array_keys($classes);
+		$sortedClasses = array_keys($classPriorities);
 		return self::$sorted_extractor_classes = $sortedClasses;
 	}
 
