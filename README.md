@@ -145,14 +145,14 @@ exec java -jar /usr/local/Cellar/tika/1.7/libexec/tika-app-1.7.jar "$@"
 
 Tika can also be run as a server.
 
-You can configure your server pointpoint either by the SS_TIKA_ENDPOINT define, or by setting the url via config.
+You can configure your server endpoint by setting the url via config.
 
 ```yaml
 TikaServerTextExtractor:
   server_endpoint: 'http://localhost:9998'
 ```
 
-Alternatively this may be specified via the `SS_TIKA_ENDPOINT` directive in your `_ss_environment.php` file.
+Alternatively this may be specified via the `SS_TIKA_ENDPOINT` directive in your `_ss_environment.php` file, or an environment variable of the same name.
 
 
 Then startup your server as below
