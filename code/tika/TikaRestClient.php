@@ -1,15 +1,9 @@
 <?php
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
+use Guzzle\Http\Client;
+use Guzzle\Http\Exception\RequestException;
 
 class TikaRestClient extends Client {
-
-	public function __construct($url) {
-		parent::__construct(array(
-			'base_url' => $url
-		));
-	}
 
 	/**
 	 * Detect if the service is available
@@ -19,7 +13,7 @@ class TikaRestClient extends Client {
 	public function isAvailable() {
 		try {
 			return $this
-				->get()
+				->get()->send()
 				->getStatusCode() == 200;
 		} catch (RequestException $ex) {
 			return false;
@@ -32,10 +26,10 @@ class TikaRestClient extends Client {
 	 * @return float
 	 */
 	public function getVersion() {
-		$response = $this->get('version');
+		$response = $this->get('version')->send();
 		// Parse output
 		if($response->getStatusCode() == 200 &&
-			preg_match('/Apache Tika (?<version>[\.\d]+)/', $response->getBody()->getContents(), $matches)
+			preg_match('/Apache Tika (?<version>[\.\d]+)/', $response->getBody(), $matches)
 		) {
 			return (float)$matches['version'];
 		}
@@ -55,10 +49,9 @@ class TikaRestClient extends Client {
 
 		$response = $this->get(
 			'mime-types',
-			array(
-				'headers' => array("Accept" => "application/json")
-			)
-		);
+			array('Accept' => 'application/json')
+		)->send();
+
 		return $this->mimes = $response->json();
 	}
 
@@ -71,12 +64,11 @@ class TikaRestClient extends Client {
 	public function tika($file) {
 		$response = $this->put(
 			'tika',
-			array(
-				'body' => file_get_contents($file),
-				'headers' => array("Accept" => "text/plain")
-			)
-		);
-		return $response->getBody()->getContents();
+			array('Accept' => 'text/plain'),
+			file_get_contents($file)
+		)->send();
+
+		return $response->getBody(true);
 	}
 
 }
