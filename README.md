@@ -127,7 +127,9 @@ each HTTP request is run synchronously.
 Support for Apache Tika (1.7 and above) is included. This can be run in one of two ways: Server or CLI.
 
 See [the Apache Tika home page](http://tika.apache.org/1.7/index.html) for instructions on installing and
-configuring this.
+configuring this. Download the latest `tika-app` for running as a CLI script, or `tika-server` if you're planning
+to have it running constantly in the background. Starting tika as a CLI script for every extraction request
+is fairly slow, so we recommend running it as a server.
 
 This extension will best work with the [fileinfo PHP extension](http://php.net/manual/en/book.fileinfo.php)
 installed to perform mime detection. Tika validates support via mime type rather than file extensions.
@@ -138,14 +140,12 @@ Ensure that your machine has a 'tika' command available which will run the CLI s
 
 ```bash
 #!/bin/bash
-exec java -jar /usr/local/Cellar/tika/1.7/libexec/tika-app-1.7.jar "$@"
+exec java -jar tika-app-1.7.jar "$@"
 ```
 
 ### Tika Rest Server
 
-Tika can also be run as a server.
-
-You can configure your server endpoint by setting the url via config.
+Tika can also be run as a server. You can configure your server endpoint by setting the url via config.
 
 ```yaml
 TikaServerTextExtractor:
