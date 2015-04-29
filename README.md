@@ -140,7 +140,7 @@ Ensure that your machine has a 'tika' command available which will run the CLI s
 
 ```bash
 #!/bin/bash
-exec java -jar tika-app-1.7.jar "$@"
+exec java -jar tika-app-1.8.jar "$@"
 ```
 
 ### Tika Rest Server
@@ -158,8 +158,11 @@ Alternatively this may be specified via the `SS_TIKA_ENDPOINT` directive in your
 Then startup your server as below
 
 ```bash
-java -jar tika-server-1.7.jar --host=localhost --port=9998
+java -jar tika-server-1.8.jar --host=localhost --port=9998
 ```
+
+While you can run `tika-app-1.8.jar` in server mode as well (with the `--server` flag),
+it behaves differently and is not recommended.
 
 ## Usage
 
