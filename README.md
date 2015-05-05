@@ -63,6 +63,24 @@ File:
 	- FileTextExtractable
 ```
 
+By default any extracted content will be cached against the database row.
+
+Alternatively, extracted content can be cached using SS_Cache to prevent excessive database growth.
+In order to swap out the cache backend you can use the following yaml configuration.
+
+
+```yaml
+---
+Name: mytextextraction
+After: '#textextraction'
+---
+Injector:
+  FileTextCache: FileTextCache_SSCache
+FileTextCache_SSCache:
+  lifetime: 3600 # Number of seconds to cache content for
+
+```
+
 ### XPDF
 
 PDFs require special handling, for example through the [XPDF](http://www.foolabs.com/xpdf/)

@@ -19,6 +19,30 @@ class FileTextExtractable extends DataExtension {
 		'FileContent' => 'Text'
 	);
 
+	private static $dependencies = array(
+		'TextCache' => '%$FileTextCache'
+	);
+
+	/**
+	 * @var FileTextCache
+	 */
+	protected $fileTextCache = null;
+
+	/**
+	 *
+	 * @param FileTextCache $cache
+	 */
+	public function setTextCache(FileTextCache $cache) {
+		$this->fileTextCache = $cache;
+	}
+
+	/**
+	 * @return FileTextCache
+	 */
+	public function getTextCache() {
+		return $this->fileTextCache;
+	}
+
 	/**
 	 * Helper function for template
 	 *
@@ -37,17 +61,25 @@ class FileTextExtractable extends DataExtension {
 	 * @return string
 	 */
 	public function extractFileAsText($disableCache = false) {
-		if (!$disableCache && $this->owner->FileContentCache) return $this->owner->FileContentCache;
+		if (!$disableCache) {
+			$text = $this->getTextCache()->load($this->owner);
+			if($text) {
+				return $text;
+			}
+		}
 
 		// Determine which extractor can process this file.
 		$extractor = FileTextExtractor::for_file($this->owner->FullPath);
-		if (!$extractor) return null;
+		if (!$extractor) {
+			return null;
+		}
 
 		$text = $extractor->getContent($this->owner->FullPath);
-		if (!$text) return null;
+		if (!$text) {
+			return null;
+		}
 
-		$this->owner->FileContentCache = $text;
-		$this->owner->write();
+		$this->getTextCache()->save($this->owner, $text);
 
 		return $text;
 	}
