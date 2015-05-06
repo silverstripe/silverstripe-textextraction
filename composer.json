@@ -19,7 +19,8 @@
 		"php": ">=5.3.2",
 		"composer/installers": "*",
 		"silverstripe/framework": "~3.1",
-		"guzzle/guzzle": "~3.9"
+		"guzzle/guzzle": "~3.9",
+		"symfony/event-dispatcher": "~2.6.0@stable"
 	},
 	"require-dev": {
 		"phpunit/PHPUnit": "~3.7@stable"
