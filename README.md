@@ -142,9 +142,9 @@ each HTTP request is run synchronously.
 
 ### Tika
 
-Support for Apache Tika (1.7 and above) is included. This can be run in one of two ways: Server or CLI.
+Support for Apache Tika (1.8 and above) is included. This can be run in one of two ways: Server or CLI.
 
-See [the Apache Tika home page](http://tika.apache.org/1.7/index.html) for instructions on installing and
+See [the Apache Tika home page](http://tika.apache.org/1.8/index.html) for instructions on installing and
 configuring this. Download the latest `tika-app` for running as a CLI script, or `tika-server` if you're planning
 to have it running constantly in the background. Starting tika as a CLI script for every extraction request
 is fairly slow, so we recommend running it as a server.
@@ -181,6 +181,14 @@ java -jar tika-server-1.8.jar --host=localhost --port=9998
 
 While you can run `tika-app-1.8.jar` in server mode as well (with the `--server` flag),
 it behaves differently and is not recommended.
+
+The module will log extraction errors with `SS_Log::NOTICE` priority by default,
+for example a "422 Unprocessable Entity" HTTP response for an encrypted PDF.
+In case you want more information on why processing failed, you can increase
+the logging verbosity in the tika server instance by passing through
+a `--includeStack` flag. Logs can passed on to files or external logging services,
+see [error handling](http://doc.silverstripe.org/en/developer_guides/debugging/error_handling)
+documentation for SilverStripe core.
 
 ## Usage
 
