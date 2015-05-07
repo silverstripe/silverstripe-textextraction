@@ -6,3 +6,6 @@ Injector:
 
 SolrCellTextExtractor:
 #  base_url: 'http://localhost:8983/solr/update/extract'
+
+FileTextCache_Database:
+  max_content_length: 500000
