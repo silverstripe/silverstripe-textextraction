@@ -64,6 +64,10 @@ File:
 ```
 
 By default any extracted content will be cached against the database row.
+In order to stay within common size constraints for SQL queries required in this operation,
+the cache sets a maximum character length after which content gets truncated (default: 500000).
+You can configure this value through `FileTextCache_Database.max_content_length` in your yaml configuration.
+
 
 Alternatively, extracted content can be cached using SS_Cache to prevent excessive database growth.
 In order to swap out the cache backend you can use the following yaml configuration.

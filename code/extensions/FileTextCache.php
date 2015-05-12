@@ -19,7 +19,8 @@ interface FileTextCache {
 }
 
 /**
- * Caches the extracted content on the record for the file
+ * Caches the extracted content on the record for the file.
+ * Limits the stored file content by default to avoid hitting query size limits.
  */
 class FileTextCache_Database implements FileTextCache {
 	
@@ -28,7 +29,8 @@ class FileTextCache_Database implements FileTextCache {
 	}
 
 	public function save(File $file, $content) {
-		$file->FileContentCache = $content;
+		$maxLength = Config::inst()->get('FileTextCache_Database', 'max_content_length');
+		$file->FileContentCache = ($maxLength) ? substr($content, 0, $maxLength) : $content;
 		$file->write();
 	}
 
