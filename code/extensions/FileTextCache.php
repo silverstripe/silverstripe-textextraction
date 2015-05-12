@@ -58,7 +58,7 @@ class FileTextCache_SSCache implements FileTextCache, Flushable {
 	}
 
 	protected function getKey(File $file) {
-		return md5($file->getFullPath);
+		return md5($file->getFullPath());
 	}
 
 	public function load(File $file) {
