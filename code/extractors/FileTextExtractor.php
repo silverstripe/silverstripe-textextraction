@@ -72,9 +72,13 @@ abstract class FileTextExtractor extends Object {
 
 	/**
 	 * @param string $path
-	 * @return FileTextExtractor
+	 * @return FileTextExtractor|null
 	 */
 	static function for_file($path) {
+		if(!file_exists($path) || is_dir($path)) {
+			return;
+		}
+
 		$extension = pathinfo($path, PATHINFO_EXTENSION);
 		$mime = self::get_mime($path);
 		foreach(self::get_extractor_classes() as $className) {
