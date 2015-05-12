@@ -83,4 +83,9 @@ class FileTextExtractable extends DataExtension {
 
 		return $text;
 	}
+
+	public function onBeforeWrite() {
+		// Clear cache before changing file
+		$this->getTextCache()->invalidate($this->owner);
+	}
 }

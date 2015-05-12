@@ -16,6 +16,14 @@ interface FileTextCache {
 	 * @param File $file
 	 */
 	public function load(File $file);
+
+	/**
+	 * Invalidate the cache for a given file.
+	 * Invoked in onBeforeWrite on the file
+	 *
+	 * @param File $file
+	 */
+	public function invalidate(File $file);
 }
 
 /**
@@ -34,6 +42,13 @@ class FileTextCache_Database implements FileTextCache {
 		$file->write();
 	}
 
+	public function invalidate(File $file) {
+		// To prevent writing to the cache from invalidating it
+		if(!$file->isChanged('FileContentCache')) {
+			$file->FileContentCache = '';
+		}
+	}
+
 }
 
 /**
@@ -42,12 +57,13 @@ class FileTextCache_Database implements FileTextCache {
 class FileTextCache_SSCache implements FileTextCache, Flushable {
 
 	/**
-	 * Default cache to 1 hour
+	 * Lifetime of cache in seconds
+	 * Null is indefinite
 	 *
-	 * @var int
+	 * @var int|null
 	 * @config
 	 */
-	private static $lifetime = 3600;
+	private static $lifetime = null;
 
 	/**
 	 * @return SS_Cache
@@ -78,6 +94,12 @@ class FileTextCache_SSCache implements FileTextCache, Flushable {
 	public static function flush() {
 		$cache = self::get_cache();
 		$cache->clean();
+	}
+
+	public function invalidate(File $file) {
+		$key = $this->getKey($file);
+		$cache = self::get_cache();
+		return $cache->remove($key);
 	}
 
 }
