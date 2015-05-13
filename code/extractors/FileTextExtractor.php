@@ -63,11 +63,9 @@ abstract class FileTextExtractor extends Object {
 	 * @return string Mime type if found
 	 */
 	protected static function get_mime($path) {
-		if(!class_exists('finfo')) return null;
+		$file = new Symfony\Component\HttpFoundation\File\File($path);
 
-		// Check mime of file
-		$finfo = new finfo(FILEINFO_MIME_TYPE);
-		return $finfo->file($path);
+		return $file->getMimeType();
 	}
 
 	/**
