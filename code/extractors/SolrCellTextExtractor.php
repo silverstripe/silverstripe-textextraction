@@ -39,7 +39,7 @@ class SolrCellTextExtractor extends FileTextExtractor {
 
 	public function isAvailable() {
 		$url = $this->config()->get('base_url');
-		if(!$url) return false;
+		return (boolean) $url;
 	}
 
 	public function supportsExtension($extension) {
