@@ -4,6 +4,13 @@ language: php
 php:
   - 5.4
 
+sudo: false
+
+addons:
+  apt:
+    packages:
+    - poppler-utils
+
 env:
   - DB=MYSQL CORE_RELEASE=3.1
   - DB=MYSQL CORE_RELEASE=3
@@ -13,7 +20,6 @@ before_script:
   - export PATH=$PATH:$HOME/bin
   - export SS_TIKA_ENDPOINT="http://localhost:9998/"
   - ./.travis/install_tika.sh
-  - sudo ./.travis/install_pdftotext.sh
   - git clone git://github.com/silverstripe-labs/silverstripe-travis-support.git ~/travis-support
   - php ~/travis-support/travis_setup.php --source `pwd` --target ~/builds/ss
   - cd ~/builds/ss
