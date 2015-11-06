@@ -1,21 +1,35 @@
 # See https://github.com/silverstripe-labs/silverstripe-travis-support for setup details
+language: php
 
-language: php 
 php:
-  - 5.4
+    - 5.3
+    - 5.4
+    - 5.5
+    - 5.6
+    - 7.0
 
 sudo: false
 
-addons:
-  apt:
-    packages:
-    - poppler-utils
-
 env:
-  - DB=MYSQL CORE_RELEASE=3.1
-  - DB=MYSQL CORE_RELEASE=3
+  - DB=MYSQL CORE_RELEASE=3.2
+
+matrix:
+  include:
+    - php: 5.6
+      env: DB=PGSQL CORE_RELEASE=3
+    - php: 5.6
+      env: DB=PGSQL CORE_RELEASE=3.1
+    - php: 5.6
+      env: DB=PGSQL CORE_RELEASE=3.2
+    - php: 5.6
+      env: DB=MYSQL CORE_RELEASE=3.3
+    - php: 5.6
+      env: DB=MYSQL CORE_RELEASE=3.2
+    - php: 5.6
+      env: DB=MYSQL CORE_RELEASE=3.1
 
 before_script:
+  - composer self-update || true
   - mkdir -p $HOME/bin
   - export PATH=$PATH:$HOME/bin
   - export SS_TIKA_ENDPOINT="http://localhost:9998/"
@@ -23,7 +37,16 @@ before_script:
   - git clone git://github.com/silverstripe-labs/silverstripe-travis-support.git ~/travis-support
   - php ~/travis-support/travis_setup.php --source `pwd` --target ~/builds/ss
   - cd ~/builds/ss
+  - composer install
 
 script:
   - ($HOME/bin/tika-rest-server &) &> /dev/null
   - vendor/bin/phpunit --verbose textextraction/tests/
+
+branches:
+    only:
+        - master
+
+matrix:
+    allow_failures:
+        - php: 7.0
