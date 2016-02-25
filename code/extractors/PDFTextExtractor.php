@@ -7,12 +7,31 @@
  */
 class PDFTextExtractor extends FileTextExtractor
 {
+    /**
+     * Set to bin path this extractor can execute
+     *
+     * @var string
+     */
+    private static $binary_location = null;
+
+    /**
+     * Used if binary_location isn't set.
+     * List of locations to search for a given binary in
+     *
+     * @config
+     * @var array
+     */
+    private static $search_binary_locations = array(
+        '/usr/bin',
+        '/usr/local/bin',
+    );
+
     public function isAvailable()
     {
         $bin = $this->bin('pdftotext');
-        return (file_exists($bin) && is_executable($bin));
+        return $bin && file_exists($bin) && is_executable($bin);
     }
-    
+
     public function supportsExtension($extension)
     {
         return strtolower($extension) === 'pdf';
@@ -34,26 +53,30 @@ class PDFTextExtractor extends FileTextExtractor
     /**
      * Accessor to get the location of the binary
      *
-     * @param string $prog Name of binary
+     * @param string $program Name of binary
      * @return string
      */
-    protected function bin($prog = '')
+    protected function bin($program = '')
     {
-        if ($this->config()->binary_location) {
-            // By config
-            $path = $this->config()->binary_location;
-        } elseif (file_exists('/usr/bin/pdftotext')) {
-            // By searching common directories
-            $path = '/usr/bin';
-        } elseif (file_exists('/usr/local/bin/pdftotext')) {
-            $path = '/usr/local/bin';
+        // Get list of allowed search paths
+        if ($location = $this->config()->binary_location) {
+            $locations = array($location);
         } else {
-            $path = '.'; // Hope it's in path
+            $locations = $this->config()->search_binary_locations;
         }
 
-        return ($path ? $path . '/' : '') . $prog;
+        // Find program in each path
+        foreach($locations as $location) {
+            $path = "{$location}/{$program}";
+            if(file_exists($path)) {
+                return $path;
+            }
+        }
+        
+        // Not found
+        return null;
     }
-    
+
     public function getContent($path)
     {
         if (!$path) {
@@ -72,6 +95,9 @@ class PDFTextExtractor extends FileTextExtractor
      */
     protected function getRawOutput($path)
     {
+        if(!$this->isAvailable()) {
+            throw new FileTextExtractor_Exception("getRawOutput called on unavailable extractor");
+        }
         exec(sprintf('%s %s - 2>&1', $this->bin('pdftotext'), escapeshellarg($path)), $content, $err);
         if ($err) {
             throw new FileTextExtractor_Exception(sprintf(
