@@ -71,6 +71,9 @@ class PDFTextExtractor extends FileTextExtractor
             if(file_exists($path)) {
                 return $path;
             }
+            if (file_exists($path.'.exe')) {
+                return $path.'.exe';
+            }
         }
         
         // Not found
@@ -100,6 +103,10 @@ class PDFTextExtractor extends FileTextExtractor
         }
         exec(sprintf('%s %s - 2>&1', $this->bin('pdftotext'), escapeshellarg($path)), $content, $err);
         if ($err) {
+            if (!is_array($err) && $err == 1) {
+                // For Windows compatibility
+                $err = $content;
+            }
             throw new FileTextExtractor_Exception(sprintf(
                 'PDFTextExtractor->getContent() failed for %s: %s',
                 $path,
