@@ -89,7 +89,7 @@ FileTextCache_SSCache:
 
 PDFs require special handling, for example through the [XPDF](http://www.foolabs.com/xpdf/)
 commandline utility. Follow their installation instructions, its presence will be automatically
-detected. You can optionally set the binary path in `mysite/_config/config.yml`:
+detected for *nix operating systems. You can optionally set the binary path (required for Windows) in `mysite/_config/config.yml`
 
 ```yml
 PDFTextExtractor:
