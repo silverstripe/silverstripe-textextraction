@@ -4,7 +4,7 @@ Name: textextraction
 Injector:
   FileTextCache: FileTextCache_Database
 
-SolrCellTextExtractor:
+#SolrCellTextExtractor:
 #  base_url: 'http://localhost:8983/solr/update/extract'
 
 FileTextCache_Database:
