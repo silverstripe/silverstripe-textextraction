@@ -72,7 +72,7 @@ class TikaServerTextExtractor extends FileTextExtractor
     {
         return $this->getServerEndpoint() &&
             $this->getClient()->isAvailable() &&
-            $this->getVersion() >= 1.7;
+            version_compare($this->getVersion(), '1.7.0') >= 0;
     }
 
     public function supportsExtension($extension)
