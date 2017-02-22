@@ -83,7 +83,9 @@ class FileTextExtractable extends DataExtension
             return null;
         }
 
-        $this->getTextCache()->save($this->owner, $text);
+        if (!$disableCache) {
+                $this->getTextCache()->save($this->owner, $text);
+        }
 
         return $text;
     }
