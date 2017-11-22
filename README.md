@@ -1,9 +1,9 @@
 # Text extraction module
 
-[![Build Status](https://secure.travis-ci.org/silverstripe-labs/silverstripe-textextraction.png)](http://travis-ci.org/silverstripe-labs/silverstripe-textextraction)
-[![Code Quality](http://img.shields.io/scrutinizer/g/silverstripe-labs/silverstripe-textextraction.svg?style=flat-square)](https://scrutinizer-ci.com/g/silverstripe-labs/silverstripe-textextraction)
-[![Version](http://img.shields.io/packagist/v/silverstripe/textextraction.svg?style=flat-square)](https://packagist.org/packages/silverstripe/silverstripe-textextraction)
-[![License](http://img.shields.io/packagist/l/silverstripe/textextraction.svg?style=flat-square)](license.md)
+[![Build Status](https://secure.travis-ci.org/silverstripe/silverstripe-textextraction.png)](http://travis-ci.org/silverstripe/silverstripe-textextraction)
+[![Code Quality](http://img.shields.io/scrutinizer/g/silverstripe/silverstripe-textextraction.svg?style=flat)](https://scrutinizer-ci.com/g/silverstripe/silverstripe-textextraction)
+[![Version](http://img.shields.io/packagist/v/silverstripe/textextraction.svg?style=flat)](https://packagist.org/packages/silverstripe/silverstripe-textextraction)
+[![License](http://img.shields.io/packagist/l/silverstripe/textextraction.svg?style=flat)](license.md)
 
 
 Provides a text extraction API for file content, that can hook into different extractor
