@@ -10,7 +10,7 @@ In this case, add the following to `mysite/_config/config.yml`:
 ```yaml
 File:
   extensions:
-	- FileTextExtractable
+    - FileTextExtractable
 ```
 
 By default any extracted content will be cached against the database row.
@@ -39,11 +39,11 @@ FileTextCache_SSCache:
 
 PDFs require special handling, for example through the [XPDF](http://www.foolabs.com/xpdf/)
 commandline utility. Follow their installation instructions, its presence will be automatically
-detected. You can optionally set the binary path in `mysite/_config/config.yml`:
+detected for \*nix operating systems. You can optionally set the binary path (required for Windows) in `mysite/_config/config.yml`:
 
 ```yml
 PDFTextExtractor:
-	binary_location: /my/path/pdftotext
+  binary_location: /my/path/pdftotext
 ```
 
 ## Apache Solr
@@ -60,10 +60,10 @@ In order to use Solr, you need to configure a URL for it (in `mysite/_config/con
 
 ```yml
 SolrCellTextExtractor:
-	base_url: 'http://localhost:8983/solr/update/extract'
+  base_url: 'http://localhost:8983/solr/update/extract'
 ```
 
-Note that in case you're using multiple cores, you'll need to add the core name to the URL 
+Note that in case you're using multiple cores, you'll need to add the core name to the URL
 (e.g. 'http://localhost:8983/solr/PageSolrIndex/update/extract').
 The ["fulltext" module](https://github.com/silverstripe-labs/silverstripe-fulltextsearch)
 uses multiple cores by default, and comes prepackaged with a Solr server.
@@ -80,7 +80,7 @@ class MyDocument extends DataObject {
 	static $db = array('Path' => 'Text');
 	function getContent() {
 		$extractor = FileTextExtractor::for_file($this->Path);
-		return $extractor ? $extractor->getContent($this->Path) : null;		
+		return $extractor ? $extractor->getContent($this->Path) : null;
 	}
 }
 class MySolrIndex extends SolrIndex {
@@ -91,7 +91,7 @@ class MySolrIndex extends SolrIndex {
 }
 ```
 
-Note: This isn't a terribly efficient way to process large amounts of files, since 
+Note: This isn't a terribly efficient way to process large amounts of files, since
 each HTTP request is run synchronously.
 
 ## Tika
