@@ -5,16 +5,16 @@ use Guzzle\Http\Exception\RequestException;
 
 class TikaRestClient extends Client
 {
-    /*
-    * Authentication options to be sent to the Tika server
-    *
-    * @var array
-    */
+    /**
+     * Authentication options to be sent to the Tika server
+     *
+     * @var array
+     */
     protected $options = array('username' => null, 'password' => null);
 
-    /*
-    * @var array
-    */
+    /**
+     * @var array
+     */
     protected $mimes = array();
 
     public function __construct($baseUrl = '', $config = null)
