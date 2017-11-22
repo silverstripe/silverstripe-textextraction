@@ -6,29 +6,22 @@ use Guzzle\Http\Exception\RequestException;
 class TikaRestClient extends Client
 {
     /*
-    * @var Array
+    * Authentication options to be sent to the Tika server
+    *
+    * @config
+    * @var array
     */
-    private static $_options = ['username' => null, 'password' => null];
+    private $options = ['username' => null, 'password' => null];
 
     /*
-    * @var Boolean
-    */
-    private static $_available = false;
-
-    /*
-    * @var Float
-    */
-    private static $_version = 0.0;
-
-    /*
-    * @var Array
+    * @var array
     */
     protected $mimes = [];
 
     public function __construct($baseUrl = '', $config = null)
     {
         if (defined('SS_TIKA_USERNAME') && defined('SS_TIKA_PASSWORD')) {
-            self::$_options = [
+            $this->options = [
                 'username' => SS_TIKA_USERNAME,
                 'password' => SS_TIKA_PASSWORD,
             ];
@@ -43,20 +36,17 @@ class TikaRestClient extends Client
      */
     public function isAvailable()
     {
-        if (!self::$_available) {
-            try {
-                $result = $this
-                    ->get(null);
-                $result->setAuth(self::$_options['username'], self::$_options['password']);
-                $result->send();
-                if ($result->getResponse()->getStatusCode() == 200) {
-                    self::$_available = true;
-                }
-            } catch (RequestException $ex) {
-                self::$_available = false;
+        try {
+            $result = $this->get(null);
+            $result->setAuth($this->options['username'], $this->options['password']);
+            $result->send();
+            if ($result->getResponse()->getStatusCode() == 200) {
+                return true;
             }
+        } catch (RequestException $ex) {
+            SS_Log::log(sprintf("Tika unavailable - %s", $ex->getMessage()), SS_Log::ERR);
+            return false;
         }
-        return self::$_available;
     }
 
     /**
@@ -66,20 +56,17 @@ class TikaRestClient extends Client
      */
     public function getVersion()
     {
-        if (self::$_version == 0.0) {
-            $response = $this->get('version');
-            $response->setAuth(self::$_options['username'], self::$_options['password']);
-            $response->send();
-            // Parse output
-            if ($response->getResponse()->getStatusCode() == 200 &&
-                preg_match('/Apache Tika (?<version>[\.\d]+)/', $response->getResponse()->getBody(), $matches)
-            ) {
-                self::$_version = (float)$matches['version'];
-            } else {
-                self::$_version = 0.0;
-            }
+        $response = $this->get('version');
+        $response->setAuth($this->options['username'], $this->options['password']);
+        $response->send();
+        $version = 0.0;
+        // Parse output
+        if ($response->getResponse()->getStatusCode() == 200 &&
+            preg_match('/Apache Tika (?<version>[\.\d]+)/', $response->getResponse()->getBody(), $matches)
+        ) {
+            $version = (float)$matches['version'];
         }
-        return self::$_version;
+        return $version;
     }
 
     /**
@@ -96,7 +83,7 @@ class TikaRestClient extends Client
             'mime-types',
             ['Accept' => 'application/json']
         );
-        $response->setAuth(self::$_options['username'], self::$_options['password']);
+        $response->setAuth($this->options['username'], $this->options['password']);
         $response->send();
         return $this->mimes = $response->getResponse()->json();
     }
@@ -117,7 +104,7 @@ class TikaRestClient extends Client
                 ['Accept' => 'text/plain'],
                 file_get_contents($file)
             );
-            $response->setAuth(self::$_options['username'], self::$_options['password']);
+            $response->setAuth($this->options['username'], $this->options['password']);
             $response->send();
             $text = $response->getResponse()->getBody(true);
         } catch (RequestException $e) {
