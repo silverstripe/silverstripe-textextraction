@@ -8,23 +8,22 @@ class TikaRestClient extends Client
     /*
     * Authentication options to be sent to the Tika server
     *
-    * @config
     * @var array
     */
-    private $options = ['username' => null, 'password' => null];
+    protected $options = array('username' => null, 'password' => null);
 
     /*
     * @var array
     */
-    protected $mimes = [];
+    protected $mimes = array();
 
     public function __construct($baseUrl = '', $config = null)
     {
         if (defined('SS_TIKA_USERNAME') && defined('SS_TIKA_PASSWORD')) {
-            $this->options = [
+            $this->options = array(
                 'username' => SS_TIKA_USERNAME,
                 'password' => SS_TIKA_PASSWORD,
-            ];
+            );
         }
         parent::__construct($baseUrl, $config);
     }
@@ -81,7 +80,7 @@ class TikaRestClient extends Client
         }
         $response = $this->get(
             'mime-types',
-            ['Accept' => 'application/json']
+            array('Accept' => 'application/json')
         );
         $response->setAuth($this->options['username'], $this->options['password']);
         $response->send();
@@ -101,7 +100,7 @@ class TikaRestClient extends Client
         try {
             $response = $this->put(
                 'tika',
-                ['Accept' => 'text/plain'],
+                array('Accept' => 'text/plain'),
                 file_get_contents($file)
             );
             $response->setAuth($this->options['username'], $this->options['password']);
