@@ -1,48 +1,6 @@
-# Text extraction module
+# Configuration
 
-[![Build Status](https://secure.travis-ci.org/silverstripe-labs/silverstripe-textextraction.png)](http://travis-ci.org/silverstripe-labs/silverstripe-textextraction)
-[![Code Quality](http://img.shields.io/scrutinizer/g/silverstripe-labs/silverstripe-textextraction.svg?style=flat-square)](https://scrutinizer-ci.com/g/silverstripe-labs/silverstripe-textextraction)
-[![Version](http://img.shields.io/packagist/v/silverstripe/textextraction.svg?style=flat-square)](https://packagist.org/packages/silverstripe/silverstripe-textextraction)
-[![License](http://img.shields.io/packagist/l/silverstripe/textextraction.svg?style=flat-square)](license.md)
-
-
-Provides a text extraction API for file content, that can hook into different extractor
-engines based on availability and the parsed file format. The output returned is always a string of the file content.
-
-Via the `FileTextExtractable` extension, this logic can be used to
-cache the extracted content on a `DataObject` subclass (usually `File`).
-
-The module supports text extraction on the following file formats:
-
- * HTML (built-in)
- * PDF (with XPDF or Solr)
- * Microsoft Word, Excel, Powerpoint (Solr)
- * OpenOffice (Solr)
- * CSV (Solr)
- * RTF (Solr)
- * EPub (Solr)
- * Many others (Tika)
-
-## Requirements
-
- * SilverStripe ^3.1
- * (optional) [XPDF](http://www.foolabs.com/xpdf/) (`pdftotext` utility)
- * (optional) [Apache Solr with ExtracingRequestHandler](http://wiki.apache.org/solr/ExtractingRequestHandler)
- * (optional) [Apache Tika](http://tika.apache.org/)
-
-## Installation
-
-```js
-composer require silverstripe/textextraction
-```
-
-The module depends on the [Guzzle HTTP Library](http://guzzlephp.org),
-which is automatically checked out by composer. Alternatively, install Guzzle
-through PEAR and ensure its in your `include_path`.
-
-## Configuration
-
-### Basic
+## Basic
 
 By default, only extraction from HTML documents is supported.
 No configuration is required for that, unless you want to make
@@ -52,7 +10,7 @@ In this case, add the following to `mysite/_config/config.yml`:
 ```yaml
 File:
   extensions:
-    - FileTextExtractable
+	- FileTextExtractable
 ```
 
 By default any extracted content will be cached against the database row.
@@ -77,18 +35,18 @@ FileTextCache_SSCache:
 
 ```
 
-### XPDF
+## XPDF
 
 PDFs require special handling, for example through the [XPDF](http://www.foolabs.com/xpdf/)
 commandline utility. Follow their installation instructions, its presence will be automatically
-detected for \*nix operating systems. You can optionally set the binary path (required for Windows) in `mysite/_config/config.yml`
+detected. You can optionally set the binary path in `mysite/_config/config.yml`:
 
 ```yml
 PDFTextExtractor:
-  binary_location: /my/path/pdftotext
+	binary_location: /my/path/pdftotext
 ```
 
-### Apache Solr
+## Apache Solr
 
 Apache Solr is a fulltext search engine, an aspect which is often used
 alongside this module. But more importantly for us, it has bindings to [Apache Tika](http://tika.apache.org/)
@@ -102,10 +60,10 @@ In order to use Solr, you need to configure a URL for it (in `mysite/_config/con
 
 ```yml
 SolrCellTextExtractor:
-  base_url: 'http://localhost:8983/solr/update/extract'
+	base_url: 'http://localhost:8983/solr/update/extract'
 ```
 
-Note that in case you're using multiple cores, you'll need to add the core name to the URL
+Note that in case you're using multiple cores, you'll need to add the core name to the URL 
 (e.g. 'http://localhost:8983/solr/PageSolrIndex/update/extract').
 The ["fulltext" module](https://github.com/silverstripe-labs/silverstripe-fulltextsearch)
 uses multiple cores by default, and comes prepackaged with a Solr server.
@@ -122,7 +80,7 @@ class MyDocument extends DataObject {
 	static $db = array('Path' => 'Text');
 	function getContent() {
 		$extractor = FileTextExtractor::for_file($this->Path);
-		return $extractor ? $extractor->getContent($this->Path) : null;
+		return $extractor ? $extractor->getContent($this->Path) : null;		
 	}
 }
 class MySolrIndex extends SolrIndex {
@@ -133,10 +91,10 @@ class MySolrIndex extends SolrIndex {
 }
 ```
 
-Note: This isn't a terribly efficient way to process large amounts of files, since
+Note: This isn't a terribly efficient way to process large amounts of files, since 
 each HTTP request is run synchronously.
 
-### Tika
+## Tika
 
 Support for Apache Tika (1.8 and above) is included. This can be run in one of two ways: Server or CLI.
 
@@ -145,21 +103,43 @@ configuring this. Download the latest `tika-app` for running as a CLI script, or
 to have it running constantly in the background. Starting tika as a CLI script for every extraction request
 is fairly slow, so we recommend running it as a server.
 
-## Bugtracker
+This extension will best work with the [fileinfo PHP extension](http://php.net/manual/en/book.fileinfo.php)
+installed to perform mime detection. Tika validates support via mime type rather than file extensions.
 
-Bugs are tracked in the issues section of this repository. Before submitting an issue please read over
-existing issues to ensure yours is unique.
+## Tika - CLI
 
-If the issue does look like a new bug:
+Ensure that your machine has a 'tika' command available which will run the CLI script.
 
- - Create a new issue
- - Describe the steps required to reproduce your issue, and the expected outcome. Unit tests, screenshots
-  and screencasts can help here.
- - Describe your environment as detailed as possible: SilverStripe version, Browser, PHP version,
- Operating System, any installed SilverStripe modules.
+```bash
+#!/bin/bash
+exec java -jar tika-app-1.8.jar "$@"
+```
 
-Please report security issues to security@silverstripe.org directly. Please don't file security issues in the bugtracker.
+## Tika Rest Server
 
-## Development and contribution
-If you would like to make contributions to the module please ensure you raise a pull request and discuss
- with the module maintainers.
+Tika can also be run as a server. You can configure your server endpoint by setting the url via config.
+
+```yaml
+TikaServerTextExtractor:
+  server_endpoint: 'http://localhost:9998'
+```
+
+Alternatively this may be specified via the `SS_TIKA_ENDPOINT` directive in your `_ss_environment.php` file, or an environment variable of the same name.
+
+
+Then startup your server as below
+
+```bash
+java -jar tika-server-1.8.jar --host=localhost --port=9998
+```
+
+While you can run `tika-app-1.8.jar` in server mode as well (with the `--server` flag),
+it behaves differently and is not recommended.
+
+The module will log extraction errors with `SS_Log::NOTICE` priority by default,
+for example a "422 Unprocessable Entity" HTTP response for an encrypted PDF.
+In case you want more information on why processing failed, you can increase
+the logging verbosity in the tika server instance by passing through
+a `--includeStack` flag. Logs can passed on to files or external logging services,
+see [error handling](http://doc.silverstripe.org/en/developer_guides/debugging/error_handling)
+documentation for SilverStripe core.
