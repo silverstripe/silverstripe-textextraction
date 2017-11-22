@@ -6,6 +6,29 @@ use Guzzle\Http\Exception\RequestException;
 class TikaRestClient extends Client
 {
     /**
+     * Authentication options to be sent to the Tika server
+     *
+     * @var array
+     */
+    protected $options = array('username' => null, 'password' => null);
+
+    /**
+     * @var array
+     */
+    protected $mimes = array();
+
+    public function __construct($baseUrl = '', $config = null)
+    {
+        if (defined('SS_TIKA_USERNAME') && defined('SS_TIKA_PASSWORD')) {
+            $this->options = array(
+                'username' => SS_TIKA_USERNAME,
+                'password' => SS_TIKA_PASSWORD,
+            );
+        }
+        parent::__construct($baseUrl, $config);
+    }
+
+    /**
      * Detect if the service is available
      *
      * @return bool
@@ -13,10 +36,14 @@ class TikaRestClient extends Client
     public function isAvailable()
     {
         try {
-            return $this
-                ->get()->send()
-                ->getStatusCode() == 200;
+            $result = $this->get(null);
+            $result->setAuth($this->options['username'], $this->options['password']);
+            $result->send();
+            if ($result->getResponse()->getStatusCode() == 200) {
+                return true;
+            }
         } catch (RequestException $ex) {
+            SS_Log::log(sprintf("Tika unavailable - %s", $ex->getMessage()), SS_Log::ERR);
             return false;
         }
     }
@@ -28,18 +55,18 @@ class TikaRestClient extends Client
      */
     public function getVersion()
     {
-        $response = $this->get('version')->send();
+        $response = $this->get('version');
+        $response->setAuth($this->options['username'], $this->options['password']);
+        $response->send();
+        $version = 0.0;
         // Parse output
-        if ($response->getStatusCode() == 200 &&
-            preg_match('/Apache Tika (?<version>[\.\d]+)/', $response->getBody(), $matches)
+        if ($response->getResponse()->getStatusCode() == 200 &&
+            preg_match('/Apache Tika (?<version>[\.\d]+)/', $response->getResponse()->getBody(), $matches)
         ) {
-            return (float)$matches['version'];
+            $version = (float)$matches['version'];
         }
-
-        return 0.0;
+        return $version;
     }
-
-    protected $mimes = array();
 
     /**
      * Gets supported mime data. May include aliased mime types.
@@ -51,13 +78,13 @@ class TikaRestClient extends Client
         if ($this->mimes) {
             return $this->mimes;
         }
-
         $response = $this->get(
             'mime-types',
             array('Accept' => 'application/json')
-        )->send();
-
-        return $this->mimes = $response->json();
+        );
+        $response->setAuth($this->options['username'], $this->options['password']);
+        $response->send();
+        return $this->mimes = $response->getResponse()->json();
     }
 
     /**
@@ -75,8 +102,10 @@ class TikaRestClient extends Client
                 'tika',
                 array('Accept' => 'text/plain'),
                 file_get_contents($file)
-            )->send();
-            $text = $response->getBody(true);
+            );
+            $response->setAuth($this->options['username'], $this->options['password']);
+            $response->send();
+            $text = $response->getResponse()->getBody(true);
         } catch (RequestException $e) {
             $msg = sprintf(
                 'TikaRestClient was not able to process %s. Response: %s %s.',
@@ -84,16 +113,13 @@ class TikaRestClient extends Client
                 $e->getResponse()->getStatusCode(),
                 $e->getResponse()->getReasonPhrase()
             );
-
             // Only available if tika-server was started with --includeStack
             $body = $e->getResponse()->getBody(true);
             if ($body) {
                 $msg .= ' Body: ' . $body;
             }
-
             SS_Log::log($msg, SS_Log::NOTICE);
         }
-        
         return $text;
     }
 }
