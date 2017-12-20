@@ -1,5 +1,12 @@
 <?php
 
+namespace SilverStripe\TextExtraction\Extractor;
+
+use SilverStripe\TextExtraction\Extractor\FileTextExtractor,
+    SilverStripe\Core\Injector\Injector,
+    SilverStripe\Core\Environment,
+    SilverStripe\TextExtraction\Rest\TikaRestClient;
+
 /**
  * Enables text extraction of file content via the Tika Rest Server
  *
@@ -36,20 +43,19 @@ class TikaServerTextExtractor extends FileTextExtractor
         return $this->client ?:
             ($this->client =
                 Injector::inst()->createWithArgs(
-                    'TikaRestClient',
+                    TikaRestClient::class,
                     array($this->getServerEndpoint())
                 )
             );
     }
 
+    /**
+     * @return string
+     */
     public function getServerEndpoint()
     {
-        if (defined('SS_TIKA_ENDPOINT')) {
-            return SS_TIKA_ENDPOINT;
-        }
-
-        if (getenv('SS_TIKA_ENDPOINT')) {
-            return getenv('SS_TIKA_ENDPOINT');
+        if ($endpoint = Environment::getEnv('SS_TIKA_ENDPOINT')) {
+            return $endpoint;
         }
 
         // Default to configured endpoint
@@ -68,6 +74,9 @@ class TikaServerTextExtractor extends FileTextExtractor
             ->getVersion();
     }
 
+    /**
+     * @return boolean
+     */
     public function isAvailable()
     {
         return $this->getServerEndpoint() &&
@@ -75,6 +84,11 @@ class TikaServerTextExtractor extends FileTextExtractor
             version_compare($this->getVersion(), '1.7.0') >= 0;
     }
 
+    /**
+     *
+     * @param  string $extension
+     * @return boolean
+     */
     public function supportsExtension($extension)
     {
         // Determine support via mime type only
@@ -89,6 +103,11 @@ class TikaServerTextExtractor extends FileTextExtractor
      */
     protected $supportedMimes = array();
 
+    /**
+     *
+     * @param  string $mime
+     * @return boolean
+     */
     public function supportsMime($mime)
     {
         $supported = $this->supportedMimes ?:

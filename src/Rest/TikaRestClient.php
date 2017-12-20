@@ -1,7 +1,12 @@
 <?php
 
-use Guzzle\Http\Client;
-use Guzzle\Http\Exception\RequestException;
+namespace SilverStripe\TextExtraction\Rest;
+
+use Guzzle\Http\Client,
+    Guzzle\Http\Exception\RequestException,
+    SilverStripe\Core\Environment,
+    Psr\Log\LoggerInterface,
+    SilverStripe\Core\Injector\Injector;
 
 class TikaRestClient extends Client
 {
@@ -17,14 +22,22 @@ class TikaRestClient extends Client
      */
     protected $mimes = array();
 
+    /**
+     *
+     * @param string $baseUrl
+     * @param array  $config
+     */
     public function __construct($baseUrl = '', $config = null)
     {
-        if (defined('SS_TIKA_USERNAME') && defined('SS_TIKA_PASSWORD')) {
+        $psswd = Environment::getEnv('SS_TIKA_PASSWORD');
+
+        if (!empty($psswd)) {
             $this->options = array(
-                'username' => SS_TIKA_USERNAME,
-                'password' => SS_TIKA_PASSWORD,
+                'username' => Environment::getEnv('SS_TIKA_USERNAME'),
+                'password' => $psswd,
             );
         }
+
         parent::__construct($baseUrl, $config);
     }
 
@@ -39,11 +52,14 @@ class TikaRestClient extends Client
             $result = $this->get(null);
             $result->setAuth($this->options['username'], $this->options['password']);
             $result->send();
+
             if ($result->getResponse()->getStatusCode() == 200) {
                 return true;
             }
         } catch (RequestException $ex) {
-            SS_Log::log(sprintf("Tika unavailable - %s", $ex->getMessage()), SS_Log::ERR);
+            $msg = sprintf("Tika unavailable - %s", $ex->getMessage());
+            Injector::inst()->get(LoggerInterface::class)->error($msg);
+
             return false;
         }
     }
@@ -59,12 +75,14 @@ class TikaRestClient extends Client
         $response->setAuth($this->options['username'], $this->options['password']);
         $response->send();
         $version = 0.0;
+
         // Parse output
         if ($response->getResponse()->getStatusCode() == 200 &&
             preg_match('/Apache Tika (?<version>[\.\d]+)/', $response->getResponse()->getBody(), $matches)
         ) {
             $version = (float)$matches['version'];
         }
+
         return $version;
     }
 
@@ -78,12 +96,14 @@ class TikaRestClient extends Client
         if ($this->mimes) {
             return $this->mimes;
         }
+
         $response = $this->get(
             'mime-types',
             array('Accept' => 'application/json')
         );
         $response->setAuth($this->options['username'], $this->options['password']);
         $response->send();
+
         return $this->mimes = $response->getResponse()->json();
     }
 
@@ -91,7 +111,7 @@ class TikaRestClient extends Client
      * Extract text content from a given file.
      * Logs a notice-level error if the document can't be parsed.
      *
-     * @param string $file Full filesystem path to a file to post
+     * @param  string $file Full filesystem path to a file to post
      * @return string Content of the file extracted as plain text
      */
     public function tika($file)
@@ -118,8 +138,10 @@ class TikaRestClient extends Client
             if ($body) {
                 $msg .= ' Body: ' . $body;
             }
-            SS_Log::log($msg, SS_Log::NOTICE);
+
+            Injector::inst()->get(LoggerInterface::class)->notice($msg);
         }
+
         return $text;
     }
 }

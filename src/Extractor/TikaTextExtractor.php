@@ -1,8 +1,12 @@
 <?php
 
+namespace SilverStripe\TextExtraction\Extractor;
+
+use SilverStripe\TextExtraction\Extractor\FileTextExtractor;
+
 /**
  * Enables text extraction of file content via the Tika CLI
- * 
+ *
  * {@link http://tika.apache.org/1.7/gettingstarted.html}
  */
 class TikaTextExtractor extends FileTextExtractor
@@ -18,7 +22,7 @@ class TikaTextExtractor extends FileTextExtractor
     /**
      * Get the version of tika installed, or 0 if not installed
      *
-     * @return float version of tika
+     * @return mixed float | int The version of tika
      */
     public function getVersion()
     {
@@ -35,11 +39,11 @@ class TikaTextExtractor extends FileTextExtractor
     /**
      * Runs an arbitrary and safely escaped shell command
      *
-     * @param string $command Full command including arguments
-     * @param string &$stdout Standand output
-     * @param string &$stderr Standard error
-     * @param string $input Content to pass via standard input
-     * @return int Exit code. 0 is success
+     * @param  string $command Full command including arguments
+     * @param  string &$stdout Standand output
+     * @param  string &$stderr Standard error
+     * @param  string $input   Content to pass via standard input
+     * @return int Exit code.  0 is success
      */
     protected function runShell($command, &$stdout = '', &$stderr = '', $input = '')
     {
@@ -51,6 +55,7 @@ class TikaTextExtractor extends FileTextExtractor
         // Invoke command
         $pipes = array();
         $proc = proc_open($command, $descriptorSpecs, $pipes);
+
         if (!is_resource($proc)) {
             return 255;
         }
@@ -68,38 +73,60 @@ class TikaTextExtractor extends FileTextExtractor
         // Get result
         return proc_close($proc);
     }
-    
+
+    /**
+     *
+     * @param  string $path
+     * @return string
+     */
     public function getContent($path)
     {
         $mode = $this->config()->output_mode;
         $command = sprintf('tika %s %s', $mode, escapeshellarg($path));
         $code = $this->runShell($command, $output);
+
         if ($code == 0) {
             return $output;
         }
     }
 
+    /**
+     *
+     * @return boolean
+     */
     public function isAvailable()
     {
         return $this->getVersion() > 0;
     }
 
+    /**
+     *
+     * @return boolean
+     */
     public function supportsExtension($extension)
     {
         // Determine support via mime type only
         return false;
     }
 
+
+    /**
+     *
+     * @param  string $mime
+     * @return boolean
+     */
     public function supportsMime($mime)
     {
         // Get list of supported mime types
         $code = $this->runShell('tika --list-supported-types', $supportedTypes, $error);
+
         if ($code) {
             return false;
         } // Error case
 
         // Check if the mime type is inside the result
         $pattern = sprintf('/\b(%s)\b/', preg_quote($mime, '/'));
+
         return (bool)preg_match($pattern, $supportedTypes);
     }
 }
