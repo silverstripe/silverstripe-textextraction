@@ -3,8 +3,7 @@
 namespace SilverStripe\TextExtraction\Extractor;
 
 use SilverStripe\TextExtraction\Extractor\FileTextExtractor,
-    Guzzle\Http\Client,
-    \InvalidArgumentException,
+    GuzzleHttp\Client,
     Psr\Log\LoggerInterface;
 
 /**
@@ -36,19 +35,19 @@ class SolrCellTextExtractor extends FileTextExtractor
 
     /**
      *
-     * @var Guzzle\Http\Client
+     * @var GuzzleHttp\Client
      */
     protected $httpClient;
 
     /**
      *
-     * @return Guzzle\Http\Client
+     * @return GuzzleHttp\Client
      * @throws InvalidArgumentException
      */
     public function getHttpClient()
     {
         if (!$this->config()->get('base_url')) {
-            throw new InvalidArgumentException('SolrCellTextExtractor.base_url not specified');
+            throw new \InvalidArgumentException('SolrCellTextExtractor.base_url not specified');
         }
         if (!$this->httpClient) {
             $this->httpClient = new Client($this->config()->get('base_url'));
@@ -59,7 +58,7 @@ class SolrCellTextExtractor extends FileTextExtractor
 
     /**
      *
-     * @param  Guzzle\Http\Client $client
+     * @param  GuzzleHttp\Client $client
      * @return void
      */
     public function setHttpClient($client)
@@ -125,7 +124,7 @@ class SolrCellTextExtractor extends FileTextExtractor
                 ->addPostFields(array('extractOnly' => 'true', 'extractFormat' => 'text'))
                 ->addPostFiles(array('myfile' => $path));
             $response = $request->send();
-        } catch (InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
             $msg = sprintf(
                     'Error extracting text from "%s" (message: %s)',
                     $path,
@@ -134,7 +133,7 @@ class SolrCellTextExtractor extends FileTextExtractor
             Injector::inst()->get(LoggerInterface::class)->notice($msg);
 
             return null;
-        } catch (Guzzle\Http\Exception\ServerErrorResponseException $e) {
+        } catch (\Exception $e) {
             // Catch other errors that Tika can throw vai Guzzle but are not caught and break Solr search query in some cases.
             $msg = sprintf(
                     'Tika server error attempting to extract from "%s" (message: %s)',

@@ -2,8 +2,8 @@
 
 namespace SilverStripe\TextExtraction\Rest;
 
-use Guzzle\Http\Client,
-    Guzzle\Http\Exception\RequestException,
+use GuzzleHttp\Client,
+    GuzzleHttp\Exception\RequestException,
     SilverStripe\Core\Environment,
     Psr\Log\LoggerInterface,
     SilverStripe\Core\Injector\Injector;
