@@ -1,0 +1,11 @@
+---
+Name: textextractioncache
+After:
+  - '#corecache'
+---
+  
+SilverStripe\Core\Injector\Injector:
+  Psr\SimpleCache\CacheInterface.FileTextCache_Cache:
+    factory: SilverStripe\Core\Cache\CacheFactory
+    constructor:
+      namespace: 'FileTextCache_Cache'

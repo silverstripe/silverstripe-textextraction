@@ -1,5 +1,10 @@
 <?php
 
+namespace SilverStripe\TextExtraction\Extractor;
+
+use SilverStripe\TextExtraction\Extractor\FileTextExtractor,
+    SilverStripe\TextExtraction\Exception\FileTextExtractor_Exception;
+
 /**
  * Text extractor that calls pdftotext to do the conversion.
  * @author mstephens
@@ -7,6 +12,7 @@
  */
 class PDFTextExtractor extends FileTextExtractor
 {
+
     /**
      * Set to bin path this extractor can execute
      *
@@ -40,13 +46,12 @@ class PDFTextExtractor extends FileTextExtractor
     public function supportsMime($mime)
     {
         return in_array(
-            strtolower($mime),
-            array(
-                'application/pdf',
-                'application/x-pdf',
-                'application/x-bzpdf',
-                'application/x-gzpdf'
-            )
+                strtolower($mime), array(
+            'application/pdf',
+            'application/x-pdf',
+            'application/x-bzpdf',
+            'application/x-gzpdf'
+                )
         );
     }
 
@@ -66,16 +71,16 @@ class PDFTextExtractor extends FileTextExtractor
         }
 
         // Find program in each path
-        foreach($locations as $location) {
+        foreach ($locations as $location) {
             $path = "{$location}/{$program}";
-            if(file_exists($path)) {
+            if (file_exists($path)) {
                 return $path;
             }
-            if (file_exists($path.'.exe')) {
-                return $path.'.exe';
+            if (file_exists($path . '.exe')) {
+                return $path . '.exe';
             }
         }
-        
+
         // Not found
         return null;
     }
@@ -92,13 +97,13 @@ class PDFTextExtractor extends FileTextExtractor
     /**
      * Invoke pdftotext with the given path
      *
-     * @param string $path
+     * @param  string $path
      * @return string Output
      * @throws FileTextExtractor_Exception
      */
     protected function getRawOutput($path)
     {
-        if(!$this->isAvailable()) {
+        if (!$this->isAvailable()) {
             throw new FileTextExtractor_Exception("getRawOutput called on unavailable extractor");
         }
         exec(sprintf('%s %s - 2>&1', $this->bin('pdftotext'), escapeshellarg($path)), $content, $err);
@@ -108,11 +113,10 @@ class PDFTextExtractor extends FileTextExtractor
                 $err = $content;
             }
             throw new FileTextExtractor_Exception(sprintf(
-                'PDFTextExtractor->getContent() failed for %s: %s',
-                $path,
-                implode(PHP_EOL, $err)
+                    'PDFTextExtractor->getContent() failed for %s: %s', $path, implode(PHP_EOL, $err)
             ));
         }
+
         return implode(PHP_EOL, $content);
     }
 
@@ -135,6 +139,8 @@ class PDFTextExtractor extends FileTextExtractor
             'ﬅ' => 'ft',
             'ﬆ' => 'st'
         );
+
         return str_replace(array_keys($mapping), array_values($mapping), $input);
     }
+
 }

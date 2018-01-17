@@ -1,10 +1,16 @@
 <?php
+
+use SilverStripe\TextExtraction\Extension\FileTextCache,
+    SilverStripe\TextExtraction\Extension\FileTextCache_Database,
+    SilverStripe\Dev\SapphireTest,
+    SilverStripe\Core\Config\Config;
+
 class FileTextCacheDatabaseTest extends SapphireTest
 {
     public function testTruncatesByMaxLength()
     {
         Config::nest();
-        
+
         Config::inst()->update('FileTextCache_Database', 'max_content_length', 5);
         $cache = new FileTextCache_Database();
         $file = $this->getMock('File', array('write'));

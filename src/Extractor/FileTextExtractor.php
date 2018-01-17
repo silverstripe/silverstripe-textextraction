@@ -1,12 +1,19 @@
 <?php
 
+namespace SilverStripe\TextExtraction\Extractor;
+
+use SilverStripe\Core\Config\Config,
+    SilverStripe\Core\Injector\Injector,
+    SilverStripe\Core\ClassInfo;
+
 /**
  * A decorator for File or a subclass that provides a method for extracting full-text from the file's external contents.
  * @author mstephens
  *
  */
-abstract class FileTextExtractor extends Object
+abstract class FileTextExtractor
 {
+
     /**
      * Set priority from 0-100.
      * The highest priority extractor for a given content type will be selected.
@@ -34,11 +41,12 @@ abstract class FileTextExtractor extends Object
         if (self::$sorted_extractor_classes) {
             return self::$sorted_extractor_classes;
         }
-        
+
         // Generate the sorted list of extractors on demand.
-        $classes = ClassInfo::subclassesFor("FileTextExtractor");
+        $classes = ClassInfo::subclassesFor(__CLASS__);
         array_shift($classes);
         $classPriorities = array();
+
         foreach ($classes as $class) {
             $classPriorities[$class] = Config::inst()->get($class, 'priority');
         }
@@ -74,8 +82,8 @@ abstract class FileTextExtractor extends Object
     }
 
     /**
-     * @param string $path
-     * @return FileTextExtractor|null
+     * @param  string $path
+     * @return mixed FileTextExtractor | null
      */
     public static function for_file($path)
     {
@@ -85,6 +93,7 @@ abstract class FileTextExtractor extends Object
 
         $extension = pathinfo($path, PATHINFO_EXTENSION);
         $mime = self::get_mime($path);
+
         foreach (self::get_extractor_classes() as $className) {
             $extractor = self::get_extractor($className);
 
@@ -108,7 +117,7 @@ abstract class FileTextExtractor extends Object
     /**
      * Checks if the extractor is supported on the current environment,
      * for example if the correct binaries or libraries are available.
-     * 
+     *
      * @return boolean
      */
     abstract public function isAvailable();
@@ -125,7 +134,7 @@ abstract class FileTextExtractor extends Object
     /**
      * Determine if this extractor suports the given mime type.
      * Will only be called if supportsExtension returns false.
-     * 
+     *
      * @param string $mime
      * @return boolean
      */
@@ -133,13 +142,9 @@ abstract class FileTextExtractor extends Object
 
     /**
      * Given a file path, extract the contents as text.
-     * 
+     *
      * @param string $path
      * @return string
      */
     abstract public function getContent($path);
-}
-
-class FileTextExtractor_Exception extends Exception
-{
 }
