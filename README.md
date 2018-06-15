@@ -1,6 +1,7 @@
 # Text extraction module
 
 [![Build Status](https://secure.travis-ci.org/silverstripe/silverstripe-textextraction.png)](http://travis-ci.org/silverstripe/silverstripe-textextraction)
+[![SilverStripe supported module](https://img.shields.io/badge/silverstripe-supported-0071C4.svg)](https://www.silverstripe.org/software/addons/silverstripe-commercially-supported-module-list/)
 [![Code Quality](http://img.shields.io/scrutinizer/g/silverstripe/silverstripe-textextraction.svg?style=flat)](https://scrutinizer-ci.com/g/silverstripe/silverstripe-textextraction)
 [![Version](http://img.shields.io/packagist/v/silverstripe/textextraction.svg?style=flat)](https://packagist.org/packages/silverstripe/silverstripe-textextraction)
 [![License](http://img.shields.io/packagist/l/silverstripe/textextraction.svg?style=flat)](license.md)
