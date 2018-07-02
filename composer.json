@@ -1,6 +1,6 @@
 {
 	"name": "silverstripe/textextraction",
-	"type": "silverstripe-module",
+	"type": "silverstripe-vendormodule",
 	"description": "Text Extraction API for SilverStripe CMS (mostly used with 'fulltextsearch' module)",
 	"homepage": "http://silverstripe.org",
 	"license": "BSD-3-Clause",
