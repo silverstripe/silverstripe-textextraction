@@ -1,5 +1,11 @@
 <?php
 
+namespace SilverStripe\TextExtraction\Tests;
+
+use SilverStripe\Dev\SapphireTest;
+use SilverStripe\TextExtraction\Extractor\TikaServerTextExtractor;
+use SilverStripe\TextExtraction\Extractor\TikaTextExtractor;
+
 /**
  * Tests the {@see TikaTextExtractor} class
  */
@@ -13,7 +19,7 @@ class TikaTextExtractorTest extends SapphireTest
         }
 
         // Check file
-        $file = Director::baseFolder() . '/textextraction/tests/fixtures/test1.pdf';
+        $file = dirname(__FILE__) . '/fixtures/test1.pdf';
         $content = $extractor->getContent($file);
         $this->assertContains('This is a test file with a link', $content);
 
@@ -31,7 +37,7 @@ class TikaTextExtractorTest extends SapphireTest
         }
 
         // Check file
-        $file = Director::baseFolder() . '/textextraction/tests/fixtures/test1.pdf';
+        $file = dirname(__FILE__) . '/fixtures/test1.pdf';
         $content = $extractor->getContent($file);
         $this->assertContains('This is a test file with a link', $content);
 
