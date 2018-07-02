@@ -134,7 +134,8 @@ class SolrCellTextExtractor extends FileTextExtractor
 
             return null;
         } catch (Exception $e) {
-            // Catch other errors that Tika can throw vai Guzzle but are not caught and break Solr search query in some cases.
+            // Catch other errors that Tika can throw vai Guzzle but are not caught and break Solr search
+            // query in some cases.
             $msg = sprintf(
                 'Tika server error attempting to extract from "%s" (message: %s)',
                 $path,

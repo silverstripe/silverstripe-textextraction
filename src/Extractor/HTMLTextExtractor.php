@@ -3,7 +3,9 @@
 namespace SilverStripe\TextExtraction\Extractor;
 
 /**
- * Text extractor that uses php function strip_tags to get just the text. OK for indexing, not the best for readable text.
+ * Text extractor that uses php function strip_tags to get just the text. OK for indexing, not
+ * the best for readable text.
+ *
  * @author mstephens
  */
 class HTMLTextExtractor extends FileTextExtractor
@@ -82,5 +84,4 @@ class HTMLTextExtractor extends FileTextExtractor
 
         return strip_tags($content);
     }
-
 }

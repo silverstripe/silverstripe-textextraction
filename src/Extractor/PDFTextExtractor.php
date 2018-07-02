@@ -144,5 +144,4 @@ class PDFTextExtractor extends FileTextExtractor
 
         return str_replace(array_keys($mapping), array_values($mapping), $input);
     }
-
 }

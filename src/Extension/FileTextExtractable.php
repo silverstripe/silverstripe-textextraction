@@ -80,8 +80,8 @@ class FileTextExtractable extends DataExtension
     }
 
     /**
-     * Tries to parse the file contents if a FileTextExtractor class exists to handle the file type, and returns the text.
-     * The value is also cached into the File record itself.
+     * Tries to parse the file contents if a FileTextExtractor class exists to handle the file type, and
+     * returns the text. The value is also cached into the File record itself.
      *
      * @param boolean $disableCache If false, the file content is only parsed on demand.
      *                              If true, the content parsing is forced, bypassing
