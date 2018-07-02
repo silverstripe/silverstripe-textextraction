@@ -2,11 +2,11 @@
 
 namespace SilverStripe\TextExtraction\Rest;
 
-use GuzzleHttp\Client,
-    GuzzleHttp\Exception\RequestException,
-    SilverStripe\Core\Environment,
-    Psr\Log\LoggerInterface,
-    SilverStripe\Core\Injector\Injector;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
+use Psr\Log\LoggerInterface;
+use SilverStripe\Core\Environment;
+use SilverStripe\Core\Injector\Injector;
 
 class TikaRestClient extends Client
 {
@@ -15,12 +15,12 @@ class TikaRestClient extends Client
      *
      * @var array
      */
-    protected $options = array('username' => null, 'password' => null);
+    protected $options = ['username' => null, 'password' => null];
 
     /**
      * @var array
      */
-    protected $mimes = array();
+    protected $mimes = [];
 
     /**
      *
@@ -29,16 +29,16 @@ class TikaRestClient extends Client
      */
     public function __construct($baseUrl = '', $config = null)
     {
-        $psswd = Environment::getEnv('SS_TIKA_PASSWORD');
+        $password = Environment::getEnv('SS_TIKA_PASSWORD');
 
-        if (!empty($psswd)) {
-            $this->options = array(
+        if (!empty($password)) {
+            $this->options = [
                 'username' => Environment::getEnv('SS_TIKA_USERNAME'),
-                'password' => $psswd,
-            );
+                'password' => $password,
+            ];
         }
 
-        parent::__construct($baseUrl, $config);
+        parent::__construct($config);
     }
 
     /**
@@ -120,7 +120,7 @@ class TikaRestClient extends Client
         try {
             $response = $this->put(
                 'tika',
-                array('Accept' => 'text/plain'),
+                ['Accept' => 'text/plain'],
                 file_get_contents($file)
             );
             $response->setAuth($this->options['username'], $this->options['password']);

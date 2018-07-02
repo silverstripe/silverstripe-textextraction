@@ -2,17 +2,18 @@
 
 namespace SilverStripe\TextExtraction\Extractor;
 
-use SilverStripe\Core\Config\Config,
-    SilverStripe\Core\Injector\Injector,
-    SilverStripe\Core\ClassInfo;
+use SilverStripe\Core\ClassInfo;
+use SilverStripe\Core\Config\Config;
+use SilverStripe\Core\Config\Configurable;
+use SilverStripe\Core\Injector\Injector;
 
 /**
  * A decorator for File or a subclass that provides a method for extracting full-text from the file's external contents.
  * @author mstephens
- *
  */
 abstract class FileTextExtractor
 {
+    use Configurable;
 
     /**
      * Set priority from 0-100.
@@ -45,7 +46,7 @@ abstract class FileTextExtractor
         // Generate the sorted list of extractors on demand.
         $classes = ClassInfo::subclassesFor(__CLASS__);
         array_shift($classes);
-        $classPriorities = array();
+        $classPriorities = [];
 
         foreach ($classes as $class) {
             $classPriorities[$class] = Config::inst()->get($class, 'priority');
@@ -76,19 +77,19 @@ abstract class FileTextExtractor
      */
     protected static function get_mime($path)
     {
-        $file = new Symfony\Component\HttpFoundation\File\File($path);
+        $file = new \Symfony\Component\HttpFoundation\File\File($path);
 
         return $file->getMimeType();
     }
 
     /**
      * @param  string $path
-     * @return mixed FileTextExtractor | null
+     * @return FileTextExtractor|null
      */
     public static function for_file($path)
     {
         if (!file_exists($path) || is_dir($path)) {
-            return;
+            return null;
         }
 
         $extension = pathinfo($path, PATHINFO_EXTENSION);
@@ -132,7 +133,7 @@ abstract class FileTextExtractor
     abstract public function supportsExtension($extension);
 
     /**
-     * Determine if this extractor suports the given mime type.
+     * Determine if this extractor supports the given mime type.
      * Will only be called if supportsExtension returns false.
      *
      * @param string $mime

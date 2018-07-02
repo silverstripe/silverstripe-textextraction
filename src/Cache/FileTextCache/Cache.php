@@ -1,19 +1,21 @@
 <?php
 
-namespace SilverStripe\TextExtraction\Extension;
+namespace SilverStripe\TextExtraction\Cache\FileTextCache;
 
-use SilverStripe\Assets\File,
-    SilverStripe\Core\Config\Config,
-    SilverStripe\TextExtraction\Extension\FileTextCache,
-    SilverStripe\Core\Flushable,
-    Psr\SimpleCache\CacheInterface,
-    SilverStripe\Core\Injector\Injector;
+use Psr\SimpleCache\CacheInterface;
+use SilverStripe\Assets\File;
+use SilverStripe\Core\Config\Configurable;
+use SilverStripe\Core\Flushable;
+use SilverStripe\Core\Injector\Injector;
+use SilverStripe\TextExtraction\Cache\FileTextCache;
 
 /**
  * Uses SS_Cache with a lifetime to cache extracted content
  */
-class FileTextCache_Cache implements FileTextCache, Flushable
+class Cache implements FileTextCache, Flushable
 {
+    use Configurable;
+
     /**
      * Lifetime of cache in seconds
      * Null is indefinite
@@ -46,7 +48,7 @@ class FileTextCache_Cache implements FileTextCache, Flushable
     /**
      *
      * @param File $file
-     * @return type
+     * @return mixed
      */
     public function load(File $file)
     {
@@ -63,8 +65,7 @@ class FileTextCache_Cache implements FileTextCache, Flushable
      */
     public function save(File $file, $content)
     {
-        $lifetime = Config::inst()->get(__CLASS__, 'lifetime');
-        $lifetime = $lifetime ?: 3600;
+        $lifetime = $this->config()->get('lifetime') ?: 3600;
         $key = $this->getKey($file);
         $cache = self::get_cache();
 
@@ -94,7 +95,7 @@ class FileTextCache_Cache implements FileTextCache, Flushable
     /**
      *
      * @param File $file
-     * @return type
+     * @return bool
      */
     public function invalidate(File $file)
     {

@@ -2,8 +2,6 @@
 
 namespace SilverStripe\TextExtraction\Extractor;
 
-use SilverStripe\TextExtraction\Extractor\FileTextExtractor;
-
 /**
  * Enables text extraction of file content via the Tika CLI
  *
@@ -47,13 +45,13 @@ class TikaTextExtractor extends FileTextExtractor
      */
     protected function runShell($command, &$stdout = '', &$stderr = '', $input = '')
     {
-        $descriptorSpecs = array(
-            0 => array("pipe", "r"),
-            1 => array("pipe", "w"),
-            2 => array("pipe", "w")
-        );
+        $descriptorSpecs = [
+            0 => ["pipe", "r"],
+            1 => ["pipe", "w"],
+            2 => ["pipe", "w"]
+        ];
         // Invoke command
-        $pipes = array();
+        $pipes = [];
         $proc = proc_open($command, $descriptorSpecs, $pipes);
 
         if (!is_resource($proc)) {
@@ -75,7 +73,6 @@ class TikaTextExtractor extends FileTextExtractor
     }
 
     /**
-     *
      * @param  string $path
      * @return string
      */
@@ -91,8 +88,7 @@ class TikaTextExtractor extends FileTextExtractor
     }
 
     /**
-     *
-     * @return boolean
+     * @return bool
      */
     public function isAvailable()
     {
@@ -100,8 +96,7 @@ class TikaTextExtractor extends FileTextExtractor
     }
 
     /**
-     *
-     * @return boolean
+     * @return bool
      */
     public function supportsExtension($extension)
     {
@@ -111,9 +106,8 @@ class TikaTextExtractor extends FileTextExtractor
 
 
     /**
-     *
      * @param  string $mime
-     * @return boolean
+     * @return bool
      */
     public function supportsMime($mime)
     {
@@ -121,8 +115,9 @@ class TikaTextExtractor extends FileTextExtractor
         $code = $this->runShell('tika --list-supported-types', $supportedTypes, $error);
 
         if ($code) {
+            // Error case
             return false;
-        } // Error case
+        }
 
         // Check if the mime type is inside the result
         $pattern = sprintf('/\b(%s)\b/', preg_quote($mime, '/'));

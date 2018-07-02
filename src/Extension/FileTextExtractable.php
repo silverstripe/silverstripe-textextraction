@@ -2,9 +2,10 @@
 
 namespace SilverStripe\TextExtraction\Extension;
 
-use SilverStripe\ORM\DataExtension,
-    SilverStripe\TextExtraction\Extension\FileTextCache,
-    SilverStripe\Control\Director;
+use SilverStripe\Control\Director;
+use SilverStripe\ORM\DataExtension;
+use SilverStripe\TextExtraction\Cache\FileTextCache;
+use SilverStripe\TextExtraction\Extractor\FileTextExtractor;
 
 /**
  * Decorate File or a File derivative to enable text extraction from the file content. Uses a set of subclasses of
@@ -22,27 +23,27 @@ class FileTextExtractable extends DataExtension
      * @var array
      * @config
      */
-    private static $db = array(
+    private static $db = [
         'FileContentCache' => 'Text'
-    );
+    ];
 
     /**
      *
      * @var array
      * @config
      */
-    private static $casting = array(
+    private static $casting = [
         'FileContent' => 'Text'
-    );
+    ];
 
     /**
      *
      * @var array
      * @config
      */
-    private static $dependencies = array(
-        'TextCache' => '%$SilverStripe\TextExtraction\Extension\FileTextCache_Cache'
-    );
+    private static $dependencies = [
+        'TextCache' => FileTextCache\Cache::class,
+    ];
 
     /**
      * @var FileTextCache
@@ -52,11 +53,12 @@ class FileTextExtractable extends DataExtension
     /**
      *
      * @param  FileTextCache $cache
-     * @return void
+     * @return $this
      */
     public function setTextCache(FileTextCache $cache)
     {
         $this->fileTextCache = $cache;
+        return $this;
     }
 
     /**
@@ -84,7 +86,7 @@ class FileTextExtractable extends DataExtension
      * @param boolean $disableCache If false, the file content is only parsed on demand.
      *                              If true, the content parsing is forced, bypassing
      *                              the cached version
-     * @return mixed string | null
+     * @return string|null
      */
     public function extractFileAsText($disableCache = false)
     {

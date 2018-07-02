@@ -2,17 +2,14 @@
 
 namespace SilverStripe\TextExtraction\Extractor;
 
-use SilverStripe\TextExtraction\Extractor\FileTextExtractor,
-    SilverStripe\TextExtraction\Exception\FileTextExtractor_Exception;
+use SilverStripe\TextExtraction\Extractor\FileTextExtractor\Exception;
 
 /**
  * Text extractor that calls pdftotext to do the conversion.
  * @author mstephens
- *
  */
 class PDFTextExtractor extends FileTextExtractor
 {
-
     /**
      * Set to bin path this extractor can execute
      *
@@ -27,10 +24,10 @@ class PDFTextExtractor extends FileTextExtractor
      * @config
      * @var array
      */
-    private static $search_binary_locations = array(
+    private static $search_binary_locations = [
         '/usr/bin',
         '/usr/local/bin',
-    );
+    ];
 
     public function isAvailable()
     {
@@ -46,12 +43,13 @@ class PDFTextExtractor extends FileTextExtractor
     public function supportsMime($mime)
     {
         return in_array(
-                strtolower($mime), array(
-            'application/pdf',
-            'application/x-pdf',
-            'application/x-bzpdf',
-            'application/x-gzpdf'
-                )
+            strtolower($mime),
+            [
+                'application/pdf',
+                'application/x-pdf',
+                'application/x-bzpdf',
+                'application/x-gzpdf'
+            ]
         );
     }
 
@@ -64,10 +62,10 @@ class PDFTextExtractor extends FileTextExtractor
     protected function bin($program = '')
     {
         // Get list of allowed search paths
-        if ($location = $this->config()->binary_location) {
-            $locations = array($location);
+        if ($location = $this->config()->get('binary_location')) {
+            $locations = [$location];
         } else {
-            $locations = $this->config()->search_binary_locations;
+            $locations = $this->config()->get('search_binary_locations');
         }
 
         // Find program in each path
@@ -88,8 +86,9 @@ class PDFTextExtractor extends FileTextExtractor
     public function getContent($path)
     {
         if (!$path) {
-            return "";
-        } // no file
+            // no file
+            return '';
+        }
         $content = $this->getRawOutput($path);
         return $this->cleanupLigatures($content);
     }
@@ -99,12 +98,12 @@ class PDFTextExtractor extends FileTextExtractor
      *
      * @param  string $path
      * @return string Output
-     * @throws FileTextExtractor_Exception
+     * @throws Exception
      */
     protected function getRawOutput($path)
     {
         if (!$this->isAvailable()) {
-            throw new FileTextExtractor_Exception("getRawOutput called on unavailable extractor");
+            throw new Exception("getRawOutput called on unavailable extractor");
         }
         exec(sprintf('%s %s - 2>&1', $this->bin('pdftotext'), escapeshellarg($path)), $content, $err);
         if ($err) {
@@ -112,8 +111,11 @@ class PDFTextExtractor extends FileTextExtractor
                 // For Windows compatibility
                 $err = $content;
             }
-            throw new FileTextExtractor_Exception(sprintf(
-                    'PDFTextExtractor->getContent() failed for %s: %s', $path, implode(PHP_EOL, $err)
+
+            throw new Exception(sprintf(
+                'PDFTextExtractor->getContent() failed for %s: %s',
+                $path,
+                implode(PHP_EOL, $err)
             ));
         }
 
@@ -130,7 +132,7 @@ class PDFTextExtractor extends FileTextExtractor
      */
     protected function cleanupLigatures($input)
     {
-        $mapping = array(
+        $mapping = [
             'ﬀ' => 'ff',
             'ﬁ' => 'fi',
             'ﬂ' => 'fl',
@@ -138,7 +140,7 @@ class PDFTextExtractor extends FileTextExtractor
             'ﬄ' => 'ffl',
             'ﬅ' => 'ft',
             'ﬆ' => 'st'
-        );
+        ];
 
         return str_replace(array_keys($mapping), array_values($mapping), $input);
     }
