@@ -1,0 +1,10 @@
+---
+Name: textextractionconfig
+---
+SilverStripe\Core\Injector\Injector:
+  # Define default FileTextCache implementation
+  SilverStripe\TextExtraction\Cache\FileTextCache:
+    class: SilverStripe\TextExtraction\Cache\FileTextCache\Database
+
+SilverStripe\TextExtraction\Cache\FileTextCache\Database:
+  max_content_length: 500000

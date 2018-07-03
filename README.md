@@ -1,11 +1,9 @@
 # Text extraction module
 
-[![Build Status](https://secure.travis-ci.org/silverstripe/silverstripe-textextraction.png)](http://travis-ci.org/silverstripe/silverstripe-textextraction)
+[![Build Status](https://travis-ci.org/silverstripe/silverstripe-textextraction.svg?branch=master)](https://travis-ci.org/silverstripe/silverstripe-textextraction)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/silverstripe/silverstripe-textextraction/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/silverstripe/silverstripe-textextraction/?branch=master)
+[![codecov](https://codecov.io/gh/silverstripe/silverstripe-textextraction/branch/master/graph/badge.svg)](https://codecov.io/gh/silverstripe/silverstripe-textextraction)
 [![SilverStripe supported module](https://img.shields.io/badge/silverstripe-supported-0071C4.svg)](https://www.silverstripe.org/software/addons/silverstripe-commercially-supported-module-list/)
-[![Code Quality](http://img.shields.io/scrutinizer/g/silverstripe/silverstripe-textextraction.svg?style=flat)](https://scrutinizer-ci.com/g/silverstripe/silverstripe-textextraction)
-[![Version](http://img.shields.io/packagist/v/silverstripe/textextraction.svg?style=flat)](https://packagist.org/packages/silverstripe/silverstripe-textextraction)
-[![License](http://img.shields.io/packagist/l/silverstripe/textextraction.svg?style=flat)](license.md)
-
 
 Provides a text extraction API for file content, that can hook into different extractor
 engines based on availability and the parsed file format. The output returned is always a string of the file content.
@@ -26,14 +24,14 @@ The module supports text extraction on the following file formats:
 
 ## Requirements
 
- * SilverStripe ^3.1
+ * SilverStripe ^4.0
  * (optional) [XPDF](http://www.foolabs.com/xpdf/) (`pdftotext` utility)
  * (optional) [Apache Solr with ExtracingRequestHandler](http://wiki.apache.org/solr/ExtractingRequestHandler)
  * (optional) [Apache Tika](http://tika.apache.org/)
 
 ## Installation
 
-```js
+```
 composer require silverstripe/textextraction
 ```
 

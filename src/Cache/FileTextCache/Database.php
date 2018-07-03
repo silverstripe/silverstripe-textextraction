@@ -1,17 +1,25 @@
 <?php
 
-namespace SilverStripe\TextExtraction\Extension;
+namespace SilverStripe\TextExtraction\Cache\FileTextCache;
 
-use SilverStripe\Assets\File,
-    SilverStripe\Core\Config\Config,
-    SilverStripe\TextExtraction\Extension\FileTextCache;
+use SilverStripe\Assets\File;
+use SilverStripe\Core\Config\Configurable;
+use SilverStripe\TextExtraction\Cache\FileTextCache;
 
 /**
  * Caches the extracted content on the record for the file.
  * Limits the stored file content by default to avoid hitting query size limits.
  */
-class FileTextCache_Database implements FileTextCache
+class Database implements FileTextCache
 {
+    use Configurable;
+
+    /**
+     * @config
+     * @var int
+     */
+    private static $max_content_length = null;
+
     /**
      *
      * @param  File $file
@@ -28,7 +36,7 @@ class FileTextCache_Database implements FileTextCache
      */
     public function save(File $file, $content)
     {
-        $maxLength = Config::inst()->get('FileTextCache_Database', 'max_content_length');
+        $maxLength = $this->config()->get('max_content_length');
         $file->FileContentCache = ($maxLength) ? substr($content, 0, $maxLength) : $content;
         $file->write();
     }

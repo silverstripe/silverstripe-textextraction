@@ -4,22 +4,20 @@ namespace SilverStripe\TextExtraction\Tests;
 
 use SilverStripe\Assets\File;
 use SilverStripe\Dev\SapphireTest;
-use SilverStripe\TextExtraction\Extractor\TikaTextExtractor;
+use SilverStripe\TextExtraction\Extractor\TikaServerTextExtractor;
 
 /**
- * Tests the {@see TikaTextExtractor} class
- *
  * @group tika-tests
  */
-class TikaTextExtractorTest extends SapphireTest
+class TikaServerTextExtractorTest extends SapphireTest
 {
     protected $usesDatabase = true;
 
-    public function testExtraction()
+    public function testServerExtraction()
     {
-        $extractor = TikaTextExtractor::create();
+        $extractor = TikaServerTextExtractor::create();
         if (!$extractor->isAvailable()) {
-            $this->markTestSkipped('tika cli not available');
+            $this->markTestSkipped('tika server not available');
         }
 
         // Check file

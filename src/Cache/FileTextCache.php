@@ -1,6 +1,6 @@
 <?php
 
-namespace SilverStripe\TextExtraction\Extension;
+namespace SilverStripe\TextExtraction\Cache;
 
 use SilverStripe\Assets\File;
 

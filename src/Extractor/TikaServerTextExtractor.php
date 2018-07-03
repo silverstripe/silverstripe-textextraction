@@ -2,10 +2,10 @@
 
 namespace SilverStripe\TextExtraction\Extractor;
 
-use SilverStripe\TextExtraction\Extractor\FileTextExtractor,
-    SilverStripe\Core\Injector\Injector,
-    SilverStripe\Core\Environment,
-    SilverStripe\TextExtraction\Rest\TikaRestClient;
+use SilverStripe\Assets\File;
+use SilverStripe\Core\Environment;
+use SilverStripe\Core\Injector\Injector;
+use SilverStripe\TextExtraction\Rest\TikaRestClient;
 
 /**
  * Enables text extraction of file content via the Tika Rest Server
@@ -36,17 +36,24 @@ class TikaServerTextExtractor extends FileTextExtractor
     protected $client = null;
 
     /**
+     * Cache of supported mime types
+     *
+     * @var array
+     */
+    protected $supportedMimes = [];
+
+    /**
      * @return TikaRestClient
      */
     public function getClient()
     {
-        return $this->client ?:
-            ($this->client =
-                Injector::inst()->createWithArgs(
-                    TikaRestClient::class,
-                    array($this->getServerEndpoint())
-                )
+        if (!$this->client) {
+            $this->client = Injector::inst()->createWithArgs(
+                TikaRestClient::class,
+                [$this->getServerEndpoint()]
             );
+        }
+        return $this->client;
     }
 
     /**
@@ -59,19 +66,17 @@ class TikaServerTextExtractor extends FileTextExtractor
         }
 
         // Default to configured endpoint
-        return $this->config()->server_endpoint;
+        return $this->config()->get('server_endpoint');
     }
 
     /**
-     * Get the version of tika installed, or 0 if not installed
+     * Get the version of Tika installed, or 0 if not installed
      *
-     * @return float version of tika
+     * @return float version of Tika
      */
     public function getVersion()
     {
-        return $this
-            ->getClient()
-            ->getVersion();
+        return $this->getClient()->getVersion();
     }
 
     /**
@@ -79,13 +84,12 @@ class TikaServerTextExtractor extends FileTextExtractor
      */
     public function isAvailable()
     {
-        return $this->getServerEndpoint() &&
-            $this->getClient()->isAvailable() &&
-            version_compare($this->getVersion(), '1.7.0') >= 0;
+        return $this->getServerEndpoint()
+            && $this->getClient()->isAvailable()
+            && version_compare($this->getVersion(), '1.7.0') >= 0;
     }
 
     /**
-     *
      * @param  string $extension
      * @return boolean
      */
@@ -95,31 +99,23 @@ class TikaServerTextExtractor extends FileTextExtractor
         return false;
     }
 
-
     /**
-     * Cache of supported mime types
-     *
-     * @var array
-     */
-    protected $supportedMimes = array();
-
-    /**
-     *
      * @param  string $mime
      * @return boolean
      */
     public function supportsMime($mime)
     {
-        $supported = $this->supportedMimes ?:
-            ($this->supportedMimes = $this->getClient()->getSupportedMimes());
+        if (!$this->supportedMimes) {
+            $this->supportedMimes = $this->getClient()->getSupportedMimes();
+        }
 
         // Check if supported (most common / quickest lookup)
-        if (isset($supported[$mime])) {
+        if (isset($this->supportedMimes[$mime])) {
             return true;
         }
 
         // Check aliases
-        foreach ($supported as $info) {
+        foreach ($this->supportedMimes as $info) {
             if (isset($info['alias']) && in_array($mime, $info['alias'])) {
                 return true;
             }
@@ -128,8 +124,9 @@ class TikaServerTextExtractor extends FileTextExtractor
         return false;
     }
 
-    public function getContent($path)
+    public function getContent($file)
     {
-        return $this->getClient()->tika($path);
+        $tempFile = $file instanceof File ? $this->getPathFromFile($file) : $file;
+        return $this->getClient()->tika($tempFile);
     }
 }

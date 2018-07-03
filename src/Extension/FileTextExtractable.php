@@ -2,9 +2,10 @@
 
 namespace SilverStripe\TextExtraction\Extension;
 
-use SilverStripe\ORM\DataExtension,
-    SilverStripe\TextExtraction\Extension\FileTextCache,
-    SilverStripe\Control\Director;
+use SilverStripe\Assets\File;
+use SilverStripe\ORM\DataExtension;
+use SilverStripe\TextExtraction\Cache\FileTextCache;
+use SilverStripe\TextExtraction\Extractor\FileTextExtractor;
 
 /**
  * Decorate File or a File derivative to enable text extraction from the file content. Uses a set of subclasses of
@@ -13,36 +14,32 @@ use SilverStripe\ORM\DataExtension,
  * Adds an additional property which is the cached contents, which is populated on demand.
  *
  * @author mstephens
- *
  */
 class FileTextExtractable extends DataExtension
 {
     /**
-     *
      * @var array
      * @config
      */
-    private static $db = array(
+    private static $db = [
         'FileContentCache' => 'Text'
-    );
+    ];
 
     /**
-     *
      * @var array
      * @config
      */
-    private static $casting = array(
+    private static $casting = [
         'FileContent' => 'Text'
-    );
+    ];
 
     /**
-     *
      * @var array
      * @config
      */
-    private static $dependencies = array(
-        'TextCache' => '%$SilverStripe\TextExtraction\Extension\FileTextCache_Cache'
-    );
+    private static $dependencies = [
+        'TextCache' => '%$' . FileTextCache::class,
+    ];
 
     /**
      * @var FileTextCache
@@ -50,13 +47,13 @@ class FileTextExtractable extends DataExtension
     protected $fileTextCache = null;
 
     /**
-     *
      * @param  FileTextCache $cache
-     * @return void
+     * @return $this
      */
     public function setTextCache(FileTextCache $cache)
     {
         $this->fileTextCache = $cache;
+        return $this;
     }
 
     /**
@@ -78,37 +75,38 @@ class FileTextExtractable extends DataExtension
     }
 
     /**
-     * Tries to parse the file contents if a FileTextExtractor class exists to handle the file type, and returns the text.
-     * The value is also cached into the File record itself.
+     * Tries to parse the file contents if a FileTextExtractor class exists to handle the file type, and
+     * returns the text. The value is also cached into the File record itself.
      *
      * @param boolean $disableCache If false, the file content is only parsed on demand.
      *                              If true, the content parsing is forced, bypassing
      *                              the cached version
-     * @return mixed string | null
+     * @return string|null
      */
     public function extractFileAsText($disableCache = false)
     {
+        /** @var File $file */
+        $file = $this->owner;
         if (!$disableCache) {
-            $text = $this->getTextCache()->load($this->owner);
+            $text = $this->getTextCache()->load($file);
             if ($text) {
                 return $text;
             }
         }
 
         // Determine which extractor can process this file.
-        $path = Director::baseFolder() . '/' . $this->owner->getFilename();
-        $extractor = FileTextExtractor::for_file($path);
+        $extractor = FileTextExtractor::for_file($file);
         if (!$extractor) {
             return null;
         }
 
-        $text = $extractor->getContent($path);
+        $text = $extractor->getContent($file);
         if (!$text) {
             return null;
         }
 
         if (!$disableCache) {
-            $this->getTextCache()->save($this->owner, $text);
+            $this->getTextCache()->save($file, $text);
         }
 
         return $text;

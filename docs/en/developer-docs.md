@@ -1,10 +1,19 @@
 # Developer documentation
+
 ## Usage
 
-Manual extraction:
+Manual extraction via string file path:
 
 ```php
 $myFile = '/my/path/myfile.pdf';
+$extractor = FileTextExtractor::for_file($myFile);
+$content = $extractor->getContent($myFile);
+```
+
+Manual extraction via File object:
+
+```php
+$myFile = File::get()->filter(['Name' => 'My file')->first();
 $extractor = FileTextExtractor::for_file($myFile);
 $content = $extractor->getContent($myFile);
 ```

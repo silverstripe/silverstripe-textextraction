@@ -2,17 +2,22 @@
 
 namespace SilverStripe\TextExtraction\Extractor;
 
-use SilverStripe\Core\Config\Config,
-    SilverStripe\Core\Injector\Injector,
-    SilverStripe\Core\ClassInfo;
+use SilverStripe\Assets\File;
+use SilverStripe\Core\ClassInfo;
+use SilverStripe\Core\Config\Config;
+use SilverStripe\Core\Config\Configurable;
+use SilverStripe\Core\Injector\Injectable;
+use SilverStripe\Core\Injector\Injector;
+use SilverStripe\TextExtraction\Extractor\FileTextExtractor\Exception;
 
 /**
  * A decorator for File or a subclass that provides a method for extracting full-text from the file's external contents.
  * @author mstephens
- *
  */
 abstract class FileTextExtractor
 {
+    use Configurable;
+    use Injectable;
 
     /**
      * Set priority from 0-100.
@@ -45,7 +50,7 @@ abstract class FileTextExtractor
         // Generate the sorted list of extractors on demand.
         $classes = ClassInfo::subclassesFor(__CLASS__);
         array_shift($classes);
-        $classPriorities = array();
+        $classPriorities = [];
 
         foreach ($classes as $class) {
             $classPriorities[$class] = Config::inst()->get($class, 'priority');
@@ -76,23 +81,25 @@ abstract class FileTextExtractor
      */
     protected static function get_mime($path)
     {
-        $file = new Symfony\Component\HttpFoundation\File\File($path);
+        $file = new \Symfony\Component\HttpFoundation\File\File($path);
 
         return $file->getMimeType();
     }
 
     /**
-     * @param  string $path
-     * @return mixed FileTextExtractor | null
+     * Given a File object, decide which extractor instance to use to handle it
+     *
+     * @param File $file
+     * @return FileTextExtractor|null
      */
-    public static function for_file($path)
+    public static function for_file(File $file)
     {
-        if (!file_exists($path) || is_dir($path)) {
-            return;
+        if (!$file) {
+            return null;
         }
 
-        $extension = pathinfo($path, PATHINFO_EXTENSION);
-        $mime = self::get_mime($path);
+        $extension = $file->getExtension();
+        $mime = $file->getMimeType();
 
         foreach (self::get_extractor_classes() as $className) {
             $extractor = self::get_extractor($className);
@@ -115,6 +122,39 @@ abstract class FileTextExtractor
     }
 
     /**
+     * Some text extractors (like pdftotext) may require a physical file to read from, so write the current
+     * file contents to a temp file and return its path
+     *
+     * @param File $file
+     * @return string
+     * @throws Exception
+     */
+    protected function getPathFromFile(File $file)
+    {
+        $path = tempnam(TEMP_PATH, 'pdftextextractor_');
+        if (false === $path) {
+            throw new Exception(static::class . '->getPathFromFile() could not allocate temporary file name');
+        }
+
+        // Append extension to temp file if one is set
+        if ($file->getExtension()) {
+            $path .= '.' . $file->getExtension();
+        }
+
+        // Remove any existing temp files with this name
+        if (file_exists($path)) {
+            unlink($path);
+        }
+
+        $bytesWritten = file_put_contents($path, $file->getStream());
+        if (false === $bytesWritten) {
+            throw new Exception(static::class . '->getPathFromFile() failed to write temporary file');
+        }
+
+        return $path;
+    }
+
+    /**
      * Checks if the extractor is supported on the current environment,
      * for example if the correct binaries or libraries are available.
      *
@@ -132,7 +172,7 @@ abstract class FileTextExtractor
     abstract public function supportsExtension($extension);
 
     /**
-     * Determine if this extractor suports the given mime type.
+     * Determine if this extractor supports the given mime type.
      * Will only be called if supportsExtension returns false.
      *
      * @param string $mime
@@ -141,10 +181,10 @@ abstract class FileTextExtractor
     abstract public function supportsMime($mime);
 
     /**
-     * Given a file path, extract the contents as text.
+     * Given a File instance, extract the contents as text.
      *
-     * @param string $path
+     * @param File|string $file Either the File instance, or a file path for a file to load
      * @return string
      */
-    abstract public function getContent($path);
+    abstract public function getContent($file);
 }

@@ -2,9 +2,12 @@
 
 namespace SilverStripe\TextExtraction\Extractor;
 
-use SilverStripe\TextExtraction\Extractor\FileTextExtractor,
-    GuzzleHttp\Client,
-    Psr\Log\LoggerInterface;
+use Exception;
+use GuzzleHttp\Client;
+use InvalidArgumentException;
+use Psr\Log\LoggerInterface;
+use SilverStripe\Assets\File;
+use SilverStripe\Core\Injector\Injector;
 
 /**
  * Text extractor that calls an Apache Solr instance
@@ -18,7 +21,7 @@ use SilverStripe\TextExtraction\Extractor\FileTextExtractor,
 class SolrCellTextExtractor extends FileTextExtractor
 {
     /**
-     * Base URL to use for solr text extraction.
+     * Base URL to use for Solr text extraction.
      * E.g. http://localhost:8983/solr/update/extract
      *
      * @config
@@ -27,43 +30,36 @@ class SolrCellTextExtractor extends FileTextExtractor
     private static $base_url;
 
     /**
-     *
      * @var int
      * @config
      */
     private static $priority = 75;
 
     /**
-     *
-     * @var GuzzleHttp\Client
+     * @var Client
      */
     protected $httpClient;
 
     /**
-     *
-     * @return GuzzleHttp\Client
-     * @throws InvalidArgumentException
+     * @return Client
      */
     public function getHttpClient()
     {
-        if (!$this->config()->get('base_url')) {
-            throw new \InvalidArgumentException('SolrCellTextExtractor.base_url not specified');
-        }
         if (!$this->httpClient) {
-            $this->httpClient = new Client($this->config()->get('base_url'));
+            $this->httpClient = new Client();
         }
 
         return $this->httpClient;
     }
 
     /**
-     *
-     * @param  GuzzleHttp\Client $client
-     * @return void
+     * @param  Client $client
+     * @return $this
      */
-    public function setHttpClient($client)
+    public function setHttpClient(Client $client)
     {
         $this->httpClient = $client;
+        return $this;
     }
 
     /**
@@ -73,30 +69,28 @@ class SolrCellTextExtractor extends FileTextExtractor
     {
         $url = $this->config()->get('base_url');
 
-        return (boolean) $url;
+        return (bool) $url;
     }
 
     /**
-     *
      * @param  string $extension
-     * @return boolean
+     * @return bool
      */
     public function supportsExtension($extension)
     {
         return in_array(
             strtolower($extension),
-            array(
+            [
                 'pdf', 'doc', 'docx', 'xls', 'xlsx',
                 'epub', 'rtf', 'odt', 'fodt', 'ods', 'fods',
                 'ppt', 'pptx', 'odp', 'fodp', 'csv'
-            )
+            ]
         );
     }
 
     /**
-     *
      * @param  string $mime
-     * @return boolean
+     * @return bool
      */
     public function supportsMime($mime)
     {
@@ -105,48 +99,57 @@ class SolrCellTextExtractor extends FileTextExtractor
     }
 
     /**
-     *
-     * @param  string $path
+     * @param File|string $file
      * @return string
+     * @throws InvalidArgumentException
      */
-    public function getContent($path)
+    public function getContent($file)
     {
-        if (!$path) {
-            return "";
-        } // no file
+        if (!$file || (is_string($file) && !file_exists($file))) {
+            // no file
+            return '';
+        }
 
-        $fileName = basename($path);
+        $fileName = $file instanceof File ? $file->getFilename() : basename($file);
         $client = $this->getHttpClient();
 
+        // Get and validate base URL
+        $baseUrl = $this->config()->get('base_url');
+        if (!$this->config()->get('base_url')) {
+            throw new InvalidArgumentException('SolrCellTextExtractor.base_url not specified');
+        }
+
         try {
+            $path = $this->getPathFromFile($file);
             $request = $client
-                ->post()
-                ->addPostFields(array('extractOnly' => 'true', 'extractFormat' => 'text'))
-                ->addPostFiles(array('myfile' => $path));
+                ->post($baseUrl)
+                ->addPostFields(['extractOnly' => 'true', 'extractFormat' => 'text'])
+                ->addPostFiles(['myfile' => $path]);
             $response = $request->send();
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             $msg = sprintf(
-                    'Error extracting text from "%s" (message: %s)',
-                    $path,
-                    $e->getMessage()
-                );
+                'Error extracting text from "%s" (message: %s)',
+                $fileName,
+                $e->getMessage()
+            );
             Injector::inst()->get(LoggerInterface::class)->notice($msg);
 
             return null;
-        } catch (\Exception $e) {
-            // Catch other errors that Tika can throw vai Guzzle but are not caught and break Solr search query in some cases.
+        } catch (Exception $e) {
+            // Catch other errors that Tika can throw vai Guzzle but are not caught and break Solr search
+            // query in some cases.
             $msg = sprintf(
-                    'Tika server error attempting to extract from "%s" (message: %s)',
-                    $path,
-                    $e->getMessage()
-                );
+                'Tika server error attempting to extract from "%s" (message: %s)',
+                $path,
+                $e->getMessage()
+            );
 
             Injector::inst()->get(LoggerInterface::class)->notice($msg);
 
             return null;
         }
 
-        // Just initialise it, it doesn't take miuch.
+        // Just initialise it, it doesn't take much.
         $matches = [];
 
         // Use preg match to avoid SimpleXML running out of memory on large text nodes

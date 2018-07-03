@@ -1,46 +1,58 @@
 <?php
+
+namespace SilverStripe\TextExtraction\Tests;
+
+use SilverStripe\Assets\File;
+use SilverStripe\Core\Config\Config;
+use SilverStripe\Dev\SapphireTest;
+use SilverStripe\TextExtraction\Extension\FileTextExtractable;
+
 class FileTextExtractableTest extends SapphireTest
 {
-    protected $requiredExtensions = array(
-        'File' => array('FileTextExtractable')
-    );
+    protected $usesDatabase = true;
 
-    public function setUp()
+    protected static $required_extensions = [
+        File::class => [
+            FileTextExtractable::class,
+        ],
+    ];
+
+    protected function setUp()
     {
         parent::setUp();
 
         // Ensure that html is a valid extension
-        Config::inst()
-            ->nest()
-            ->update('File', 'allowed_extensions', array('html'));
+        Config::modify()->merge(File::class, 'allowed_extensions', ['html']);
+
+        // Create a copy of the file, as it may be clobbered by the test
+        // ($file->extractFileAsText() calls $file->write)
+        copy(
+            dirname(__FILE__) . '/fixtures/test1.html',
+            dirname(__FILE__) . '/fixtures/test1-copy.html'
+        );
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
-        Config::unnest();
+        if (file_exists(dirname(__FILE__) . '/fixtures/test1-copy.html')) {
+            unlink(dirname(__FILE__) . '/fixtures/test1-copy.html');
+        }
+
         parent::tearDown();
     }
 
     public function testExtractFileAsText()
     {
-        // Create a copy of the file, as it may be clobbered by the test
-        // ($file->extractFileAsText() calls $file->write)
-        copy(BASE_PATH.'/textextraction/tests/fixtures/test1.html', BASE_PATH.'/textextraction/tests/fixtures/test1-copy.html');
-        
         // Use HTML, since the extractor is always available
-        $file = new File(array(
-            'Name' => 'test1-copy.html',
-            'Filename' => 'textextraction/tests/fixtures/test1-copy.html'
-        ));
+        /** @var File|FileTextExtractable $file */
+        $file = new File(['Name' => 'test1-copy.html']);
+        $file->setFromLocalFile(dirname(__FILE__) . '/fixtures/test1-copy.html');
         $file->write();
-    
+
         $content = $file->extractFileAsText();
+        $this->assertNotNull($content);
         $this->assertContains('Test Headline', $content);
         $this->assertContains('Test Text', $content);
         $this->assertEquals($content, $file->FileContentCache);
-
-        if (file_exists(BASE_PATH.'/textextraction/tests/fixtures/test1-copy.html')) {
-            unlink(BASE_PATH.'/textextraction/tests/fixtures/test1-copy.html');
-        }
     }
 }
