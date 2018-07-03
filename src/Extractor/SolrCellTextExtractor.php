@@ -99,18 +99,18 @@ class SolrCellTextExtractor extends FileTextExtractor
     }
 
     /**
-     * @param File $file
+     * @param File|string $file
      * @return string
      * @throws InvalidArgumentException
      */
-    public function getContent(File $file)
+    public function getContent($file)
     {
-        if (!$file) {
+        if (!$file || (is_string($file) && !file_exists($file))) {
             // no file
             return '';
         }
 
-        $fileName = $file->getFilename();
+        $fileName = $file instanceof File ? $file->getFilename() : basename($file);
         $client = $this->getHttpClient();
 
         // Get and validate base URL

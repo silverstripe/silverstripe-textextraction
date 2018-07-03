@@ -54,9 +54,9 @@ class HTMLTextExtractor extends FileTextExtractor
      * @param File $file
      * @return string
      */
-    public function getContent(File $file)
+    public function getContent($file)
     {
-        $content = $file->getString();
+        $content = $file instanceof File ? $file->getString() : file_get_contents($file);
 
         // Yes, yes, regex'ing HTML is evil.
         // Since we don't care about well-formedness or markup here, it does the job.

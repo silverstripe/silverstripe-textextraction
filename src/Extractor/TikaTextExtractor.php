@@ -74,10 +74,10 @@ class TikaTextExtractor extends FileTextExtractor
         return proc_close($proc);
     }
 
-    public function getContent(File $file)
+    public function getContent($file)
     {
         $mode = $this->config()->get('output_mode');
-        $path = $this->getPathFromFile($file);
+        $path = $file instanceof File ? $this->getPathFromFile($file) : $file;
         $command = sprintf('tika %s %s', $mode, escapeshellarg($path));
         $code = $this->runShell($command, $output);
 

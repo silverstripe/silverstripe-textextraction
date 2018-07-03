@@ -84,9 +84,9 @@ class PDFTextExtractor extends FileTextExtractor
         return null;
     }
 
-    public function getContent(File $file)
+    public function getContent($file)
     {
-        if (!$file) {
+        if (!$file || (is_string($file) && !file_exists($file))) {
             // no file
             return '';
         }
@@ -97,17 +97,17 @@ class PDFTextExtractor extends FileTextExtractor
     /**
      * Invoke pdftotext with the given File object
      *
-     * @param  File $file
+     * @param  File|string $file
      * @return string Output
      * @throws Exception
      */
-    protected function getRawOutput(File $file)
+    protected function getRawOutput($file)
     {
         if (!$this->isAvailable()) {
             throw new Exception("getRawOutput called on unavailable extractor");
         }
 
-        $path = $this->getPathFromFile($file);
+        $path = $file instanceof File ? $this->getPathFromFile($file) : $file;
         exec(sprintf('%s %s - 2>&1', $this->bin('pdftotext'), escapeshellarg($path)), $content, $err);
         if ($err) {
             if (!is_array($err) && $err == 1) {

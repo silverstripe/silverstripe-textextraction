@@ -181,8 +181,8 @@ abstract class FileTextExtractor
     /**
      * Given a File instance, extract the contents as text.
      *
-     * @param File $file
+     * @param File|string $file Either the File instance, or a file path for a file to load
      * @return string
      */
-    abstract public function getContent(File $file);
+    abstract public function getContent($file);
 }
