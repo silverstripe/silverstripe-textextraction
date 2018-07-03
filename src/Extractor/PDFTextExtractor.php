@@ -4,7 +4,6 @@ namespace SilverStripe\TextExtraction\Extractor;
 
 use SilverStripe\Assets\File;
 use SilverStripe\TextExtraction\Extractor\FileTextExtractor\Exception;
-use function tempnam;
 
 /**
  * Text extractor that calls pdftotext to do the conversion.

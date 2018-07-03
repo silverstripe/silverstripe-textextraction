@@ -140,7 +140,9 @@ abstract class FileTextExtractor
         }
 
         // Remove any existing temp files with this name
-        unlink($path);
+        if (file_exists($path)) {
+            unlink($path);
+        }
 
         $bytesWritten = file_put_contents($path, $file->getStream());
         if (false === $bytesWritten) {

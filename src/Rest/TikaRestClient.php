@@ -25,9 +25,9 @@ class TikaRestClient extends Client
     /**
      *
      * @param string $baseUrl
-     * @param array  $config
+     * @param array $config
      */
-    public function __construct($baseUrl = '', $config = null)
+    public function __construct($baseUrl = '', $config = [])
     {
         $password = Environment::getEnv('SS_TIKA_PASSWORD');
 

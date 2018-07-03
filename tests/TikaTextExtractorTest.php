@@ -2,6 +2,7 @@
 
 namespace SilverStripe\TextExtraction\Tests;
 
+use SilverStripe\Assets\File;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\TextExtraction\Extractor\TikaServerTextExtractor;
 use SilverStripe\TextExtraction\Extractor\TikaTextExtractor;
@@ -11,6 +12,8 @@ use SilverStripe\TextExtraction\Extractor\TikaTextExtractor;
  */
 class TikaTextExtractorTest extends SapphireTest
 {
+    protected $usesDatabase = true;
+
     public function testExtraction()
     {
         $extractor = new TikaTextExtractor();
@@ -19,7 +22,10 @@ class TikaTextExtractorTest extends SapphireTest
         }
 
         // Check file
-        $file = dirname(__FILE__) . '/fixtures/test1.pdf';
+        $file = new File();
+        $file->setFromLocalFile(dirname(__FILE__) . '/fixtures/test1.pdf');
+        $file->write();
+
         $content = $extractor->getContent($file);
         $this->assertContains('This is a test file with a link', $content);
 
@@ -37,7 +43,10 @@ class TikaTextExtractorTest extends SapphireTest
         }
 
         // Check file
-        $file = dirname(__FILE__) . '/fixtures/test1.pdf';
+        $file = new File();
+        $file->setFromLocalFile(dirname(__FILE__) . '/fixtures/test1.pdf');
+        $file->write();
+
         $content = $extractor->getContent($file);
         $this->assertContains('This is a test file with a link', $content);
 
