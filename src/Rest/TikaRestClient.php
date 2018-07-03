@@ -58,7 +58,7 @@ class TikaRestClient extends Client
             }
         } catch (RequestException $ex) {
             $msg = sprintf("Tika unavailable - %s", $ex->getMessage());
-            Injector::inst()->get(LoggerInterface::class)->notice($msg);
+            Injector::inst()->get(LoggerInterface::class)->info($msg);
 
             return false;
         }
@@ -139,7 +139,7 @@ class TikaRestClient extends Client
                 $msg .= ' Body: ' . $body;
             }
 
-            Injector::inst()->get(LoggerInterface::class)->notice($msg);
+            Injector::inst()->get(LoggerInterface::class)->info($msg);
         }
 
         return $text;

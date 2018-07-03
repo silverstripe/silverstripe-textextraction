@@ -6,6 +6,7 @@ use SilverStripe\Assets\File;
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Config\Configurable;
+use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\TextExtraction\Extractor\FileTextExtractor\Exception;
 
@@ -16,6 +17,7 @@ use SilverStripe\TextExtraction\Extractor\FileTextExtractor\Exception;
 abstract class FileTextExtractor
 {
     use Configurable;
+    use Injectable;
 
     /**
      * Set priority from 0-100.
