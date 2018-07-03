@@ -2,6 +2,8 @@
 
 namespace SilverStripe\TextExtraction\Extractor;
 
+use SilverStripe\Assets\File;
+
 /**
  * Enables text extraction of file content via the Tika CLI
  *
@@ -72,13 +74,10 @@ class TikaTextExtractor extends FileTextExtractor
         return proc_close($proc);
     }
 
-    /**
-     * @param  string $path
-     * @return string
-     */
-    public function getContent($path)
+    public function getContent(File $file)
     {
-        $mode = $this->config()->output_mode;
+        $mode = $this->config()->get('output_mode');
+        $path = $this->getPathFromFile($file);
         $command = sprintf('tika %s %s', $mode, escapeshellarg($path));
         $code = $this->runShell($command, $output);
 

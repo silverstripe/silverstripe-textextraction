@@ -23,31 +23,36 @@ class FileTextExtractableTest extends SapphireTest
 
         // Ensure that html is a valid extension
         Config::modify()->merge(File::class, 'allowed_extensions', ['html']);
-    }
 
-    public function testExtractFileAsText()
-    {
         // Create a copy of the file, as it may be clobbered by the test
         // ($file->extractFileAsText() calls $file->write)
         copy(
             dirname(__FILE__) . '/fixtures/test1.html',
             dirname(__FILE__) . '/fixtures/test1-copy.html'
         );
+    }
 
-        // Use HTML, since the extractor is always available
-        $file = new File([
-            'Name' => 'test1-copy.html',
-            'Filename' => dirname(__FILE__) . '/fixtures/test1-copy.html'
-        ]);
-        $file->write();
-
-        $content = $file->extractFileAsText();
-        $this->assertContains('Test Headline', $content);
-        $this->assertContains('Test Text', $content);
-        $this->assertEquals($content, $file->FileContentCache);
-
+    protected function tearDown()
+    {
         if (file_exists(dirname(__FILE__) . '/fixtures/test1-copy.html')) {
             unlink(dirname(__FILE__) . '/fixtures/test1-copy.html');
         }
+
+        parent::tearDown();
+    }
+
+    public function testExtractFileAsText()
+    {
+        // Use HTML, since the extractor is always available
+        /** @var File|FileTextExtractable $file */
+        $file = new File(['Name' => 'test1-copy.html']);
+        $file->setFromLocalFile(dirname(__FILE__) . '/fixtures/test1-copy.html');
+        $file->write();
+
+        $content = $file->extractFileAsText();
+        $this->assertNotNull($content);
+        $this->assertContains('Test Headline', $content);
+        $this->assertContains('Test Text', $content);
+        $this->assertEquals($content, $file->FileContentCache);
     }
 }

@@ -2,7 +2,9 @@
 
 namespace SilverStripe\TextExtraction\Extractor;
 
+use SilverStripe\Assets\File;
 use SilverStripe\TextExtraction\Extractor\FileTextExtractor\Exception;
+use function tempnam;
 
 /**
  * Text extractor that calls pdftotext to do the conversion.
@@ -83,28 +85,30 @@ class PDFTextExtractor extends FileTextExtractor
         return null;
     }
 
-    public function getContent($path)
+    public function getContent(File $file)
     {
-        if (!$path) {
+        if (!$file) {
             // no file
             return '';
         }
-        $content = $this->getRawOutput($path);
+        $content = $this->getRawOutput($file);
         return $this->cleanupLigatures($content);
     }
 
     /**
-     * Invoke pdftotext with the given path
+     * Invoke pdftotext with the given File object
      *
-     * @param  string $path
+     * @param  File $file
      * @return string Output
      * @throws Exception
      */
-    protected function getRawOutput($path)
+    protected function getRawOutput(File $file)
     {
         if (!$this->isAvailable()) {
             throw new Exception("getRawOutput called on unavailable extractor");
         }
+
+        $path = $this->getPathFromFile($file);
         exec(sprintf('%s %s - 2>&1', $this->bin('pdftotext'), escapeshellarg($path)), $content, $err);
         if ($err) {
             if (!is_array($err) && $err == 1) {

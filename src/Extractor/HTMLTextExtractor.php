@@ -2,6 +2,8 @@
 
 namespace SilverStripe\TextExtraction\Extractor;
 
+use SilverStripe\Assets\File;
+
 /**
  * Text extractor that uses php function strip_tags to get just the text. OK for indexing, not
  * the best for readable text.
@@ -49,12 +51,13 @@ class HTMLTextExtractor extends FileTextExtractor
      * combined with regular expressions to remove non-content tags like <style> or <script>,
      * as well as adding line breaks after block tags.
      *
-     * @param string $path
+     * @param File $file
      * @return string
      */
-    public function getContent($path)
+    public function getContent(File $file)
     {
-        $content = file_get_contents($path);
+        $content = $file->getString();
+
         // Yes, yes, regex'ing HTML is evil.
         // Since we don't care about well-formedness or markup here, it does the job.
         $content = preg_replace(

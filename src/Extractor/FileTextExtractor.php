@@ -2,10 +2,12 @@
 
 namespace SilverStripe\TextExtraction\Extractor;
 
+use SilverStripe\Assets\File;
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Injector\Injector;
+use SilverStripe\TextExtraction\Extractor\FileTextExtractor\Exception;
 
 /**
  * A decorator for File or a subclass that provides a method for extracting full-text from the file's external contents.
@@ -83,17 +85,19 @@ abstract class FileTextExtractor
     }
 
     /**
-     * @param  string $path
+     * Given a File object, decide which extractor instance to use to handle it
+     *
+     * @param File $file
      * @return FileTextExtractor|null
      */
-    public static function for_file($path)
+    public static function for_file(File $file)
     {
-        if (!file_exists($path) || is_dir($path)) {
+        if (!$file) {
             return null;
         }
 
-        $extension = pathinfo($path, PATHINFO_EXTENSION);
-        $mime = self::get_mime($path);
+        $extension = $file->getExtension();
+        $mime = $file->getMimeType();
 
         foreach (self::get_extractor_classes() as $className) {
             $extractor = self::get_extractor($className);
@@ -113,6 +117,37 @@ abstract class FileTextExtractor
                 return $extractor;
             }
         }
+    }
+
+    /**
+     * Some text extractors (like pdftotext) may require a physical file to read from, so write the current
+     * file contents to a temp file and return its path
+     *
+     * @param File $file
+     * @return string
+     * @throws Exception
+     */
+    protected function getPathFromFile(File $file)
+    {
+        $path = tempnam(TEMP_PATH, 'pdftextextractor_');
+        if (false === $path) {
+            throw new Exception(static::class . '->getPathFromFile() could not allocate temporary file name');
+        }
+
+        // Append extension to temp file if one is set
+        if ($file->getExtension()) {
+            $path .= '.' . $file->getExtension();
+        }
+
+        // Remove any existing temp files with this name
+        unlink($path);
+
+        $bytesWritten = file_put_contents($path, $file->getStream());
+        if (false === $bytesWritten) {
+            throw new Exception(static::class . '->getPathFromFile() failed to write temporary file');
+        }
+
+        return $path;
     }
 
     /**
@@ -142,10 +177,10 @@ abstract class FileTextExtractor
     abstract public function supportsMime($mime);
 
     /**
-     * Given a file path, extract the contents as text.
+     * Given a File instance, extract the contents as text.
      *
-     * @param string $path
+     * @param File $file
      * @return string
      */
-    abstract public function getContent($path);
+    abstract public function getContent(File $file);
 }

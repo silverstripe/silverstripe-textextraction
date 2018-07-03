@@ -2,6 +2,7 @@
 
 namespace SilverStripe\TextExtraction\Extractor;
 
+use SilverStripe\Assets\File;
 use SilverStripe\Core\Environment;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\TextExtraction\Rest\TikaRestClient;
@@ -123,8 +124,9 @@ class TikaServerTextExtractor extends FileTextExtractor
         return false;
     }
 
-    public function getContent($path)
+    public function getContent(File $file)
     {
-        return $this->getClient()->tika($path);
+        $tempFile = $this->getPathFromFile($file);
+        return $this->getClient()->tika($tempFile);
     }
 }

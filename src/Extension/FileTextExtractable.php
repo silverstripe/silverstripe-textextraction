@@ -2,7 +2,7 @@
 
 namespace SilverStripe\TextExtraction\Extension;
 
-use SilverStripe\Control\Director;
+use SilverStripe\Assets\File;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\TextExtraction\Cache\FileTextCache;
 use SilverStripe\TextExtraction\Extractor\FileTextExtractor;
@@ -14,12 +14,10 @@ use SilverStripe\TextExtraction\Extractor\FileTextExtractor;
  * Adds an additional property which is the cached contents, which is populated on demand.
  *
  * @author mstephens
- *
  */
 class FileTextExtractable extends DataExtension
 {
     /**
-     *
      * @var array
      * @config
      */
@@ -28,7 +26,6 @@ class FileTextExtractable extends DataExtension
     ];
 
     /**
-     *
      * @var array
      * @config
      */
@@ -37,12 +34,11 @@ class FileTextExtractable extends DataExtension
     ];
 
     /**
-     *
      * @var array
      * @config
      */
     private static $dependencies = [
-        'TextCache' => FileTextCache\Cache::class,
+        'TextCache' => '%$' . FileTextCache::class,
     ];
 
     /**
@@ -51,7 +47,6 @@ class FileTextExtractable extends DataExtension
     protected $fileTextCache = null;
 
     /**
-     *
      * @param  FileTextCache $cache
      * @return $this
      */
@@ -90,27 +85,28 @@ class FileTextExtractable extends DataExtension
      */
     public function extractFileAsText($disableCache = false)
     {
+        /** @var File $file */
+        $file = $this->owner;
         if (!$disableCache) {
-            $text = $this->getTextCache()->load($this->owner);
+            $text = $this->getTextCache()->load($file);
             if ($text) {
                 return $text;
             }
         }
 
         // Determine which extractor can process this file.
-        $path = Director::baseFolder() . '/' . $this->owner->getFilename();
-        $extractor = FileTextExtractor::for_file($path);
+        $extractor = FileTextExtractor::for_file($file);
         if (!$extractor) {
             return null;
         }
 
-        $text = $extractor->getContent($path);
+        $text = $extractor->getContent($file);
         if (!$text) {
             return null;
         }
 
         if (!$disableCache) {
-            $this->getTextCache()->save($this->owner, $text);
+            $this->getTextCache()->save($file, $text);
         }
 
         return $text;

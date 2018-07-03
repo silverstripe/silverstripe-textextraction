@@ -6,6 +6,7 @@ use Exception;
 use GuzzleHttp\Client;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
+use SilverStripe\Assets\File;
 use SilverStripe\Core\Injector\Injector;
 
 /**
@@ -98,18 +99,18 @@ class SolrCellTextExtractor extends FileTextExtractor
     }
 
     /**
-     * @param string $path
+     * @param File $file
      * @return string
      * @throws InvalidArgumentException
      */
-    public function getContent($path)
+    public function getContent(File $file)
     {
-        if (!$path) {
+        if (!$file) {
             // no file
             return '';
         }
 
-        $fileName = basename($path);
+        $fileName = $file->getFilename();
         $client = $this->getHttpClient();
 
         // Get and validate base URL
@@ -119,6 +120,7 @@ class SolrCellTextExtractor extends FileTextExtractor
         }
 
         try {
+            $path = $this->getPathFromFile($file);
             $request = $client
                 ->post($baseUrl)
                 ->addPostFields(['extractOnly' => 'true', 'extractFormat' => 'text'])
@@ -127,7 +129,7 @@ class SolrCellTextExtractor extends FileTextExtractor
         } catch (InvalidArgumentException $e) {
             $msg = sprintf(
                 'Error extracting text from "%s" (message: %s)',
-                $path,
+                $fileName,
                 $e->getMessage()
             );
             Injector::inst()->get(LoggerInterface::class)->notice($msg);
