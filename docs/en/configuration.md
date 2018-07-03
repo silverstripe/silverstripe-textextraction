@@ -8,31 +8,30 @@ the content available through your `DataObject` subclass.
 In this case, add the following to `mysite/_config/config.yml`:
 
 ```yaml
-File:
+SilverStripe\Assets\File:
   extensions:
-    - FileTextExtractable
+    - SilverStripe\TextExtraction\Extension\FileTextExtractable
 ```
 
-By default any extracted content will be cached against the database row.
-In order to stay within common size constraints for SQL queries required in this operation,
-the cache sets a maximum character length after which content gets truncated (default: 500000).
-You can configure this value through `FileTextCache_Database.max_content_length` in your yaml configuration.
-
+By default any extracted content will be cached against the database row. In order to stay within common size
+constraints for SQL queries required in this operation, the cache sets a maximum character length after which
+content gets truncated (default: 500000). You can configure this value through
+`SilverStripe\TextExtraction\Cache\FileTextCache\Database.max_content_length` in your YAML configuration.
 
 Alternatively, extracted content can be cached using SS_Cache to prevent excessive database growth.
 In order to swap out the cache backend you can use the following yaml configuration.
-
 
 ```yaml
 ---
 Name: mytextextraction
 After: '#textextraction'
 ---
-Injector:
-  FileTextCache: FileTextCache_SSCache
-FileTextCache_SSCache:
-  lifetime: 3600 # Number of seconds to cache content for
+SilverStripe\Core\Injector\Injector:
+  SilverStripe\TextExtraction\Cache\FileTextCache:
+    class: SilverStripe\TextExtraction\Cache\FileTextCache\Cache
 
+SilverStripe\TextExtraction\Cache\FileTextCache\Database:
+  lifetime: 3600 # Number of seconds to cache content for
 ```
 
 ## XPDF
@@ -42,7 +41,7 @@ commandline utility. Follow their installation instructions, its presence will b
 detected for \*nix operating systems. You can optionally set the binary path (required for Windows) in `mysite/_config/config.yml`:
 
 ```yml
-PDFTextExtractor:
+SilverStripe\TextExtraction\Extractor\PDFTextExtractor:
   binary_location: /my/path/pdftotext
 ```
 
@@ -59,7 +58,7 @@ in your database driver, or even pass it back to Solr as part of a full index up
 In order to use Solr, you need to configure a URL for it (in `mysite/_config/config.yml`):
 
 ```yml
-SolrCellTextExtractor:
+SilverStripe\TextExtraction\Extractor\SolrCellTextExtractor:
   base_url: 'http://localhost:8983/solr/update/extract'
 ```
 
@@ -76,16 +75,27 @@ or by writing your own method around `FileTextExtractor->getContent()` (see "Usa
 The property should be listed in your `SolrIndex` subclass, e.g. as follows:
 
 ```php
-class MyDocument extends DataObject {
-	static $db = array('Path' => 'Text');
-	function getContent() {
+use SilverStripe\ORM\DataObject;
+use SilverStripe\TextExtraction\Extractor\FileTextExtractor;
+
+class MyDocument extends DataObject
+{
+	private static $db = ['Path' => 'Text'];
+	
+	public function getContent()
+	{
 		$extractor = FileTextExtractor::for_file($this->Path);
 		return $extractor ? $extractor->getContent($this->Path) : null;
 	}
 }
-class MySolrIndex extends SolrIndex {
-	function init() {
-		$this->addClass('MyDocument');
+
+use SilverStripe\FullTextSearch\Solr;
+
+class MySolrIndex extends SolrIndex
+{
+	public function init()
+	{
+		$this->addClass(MyDocument::class);
 		$this->addStoredField('Content', 'HTMLText');
 	}
 }
@@ -120,14 +130,15 @@ exec java -jar tika-app-1.8.jar "$@"
 Tika can also be run as a server. You can configure your server endpoint by setting the url via config.
 
 ```yaml
-TikaServerTextExtractor:
+SilverStripe\TextExtraction\Extractor\TikaServerTextExtractor:
   server_endpoint: 'http://localhost:9998'
 ```
 
-Alternatively this may be specified via the `SS_TIKA_ENDPOINT` directive in your `_ss_environment.php` file, or an environment variable of the same name.
+Alternatively this may be specified via the `SS_TIKA_ENDPOINT` environment variable in your `.env` file, or an
+environment variable of the same name.
 
 
-Then startup your server as below
+Then startup your server as below:
 
 ```bash
 java -jar tika-server-1.8.jar --host=localhost --port=9998
@@ -136,7 +147,7 @@ java -jar tika-server-1.8.jar --host=localhost --port=9998
 While you can run `tika-app-1.8.jar` in server mode as well (with the `--server` flag),
 it behaves differently and is not recommended.
 
-The module will log extraction errors with `SS_Log::NOTICE` priority by default,
+The module will log extraction errors with PSR-3 "notice" priority by default,
 for example a "422 Unprocessable Entity" HTTP response for an encrypted PDF.
 In case you want more information on why processing failed, you can increase
 the logging verbosity in the tika server instance by passing through
