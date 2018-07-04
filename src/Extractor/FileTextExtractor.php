@@ -74,19 +74,6 @@ abstract class FileTextExtractor
     }
 
     /**
-     * Attempt to detect mime type for given file
-     *
-     * @param string $path
-     * @return string Mime type if found
-     */
-    protected static function get_mime($path)
-    {
-        $file = new \Symfony\Component\HttpFoundation\File\File($path);
-
-        return $file->getMimeType();
-    }
-
-    /**
      * Given a File object, decide which extractor instance to use to handle it
      *
      * @param File $file
