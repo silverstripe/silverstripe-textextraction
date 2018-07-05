@@ -106,7 +106,7 @@ class TikaServerTextExtractor extends FileTextExtractor
     public function supportsMime($mime)
     {
         if (!$this->supportedMimes) {
-            $this->supportedMimes = $this->getClient()->getSupportedMimes();
+            $this->supportedMimes = (array) $this->getClient()->getSupportedMimes();
         }
 
         // Check if supported (most common / quickest lookup)
