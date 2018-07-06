@@ -4,6 +4,7 @@ namespace SilverStripe\TextExtraction\Extractor;
 
 use Exception;
 use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Response;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use SilverStripe\Assets\File;
@@ -120,12 +121,16 @@ class SolrCellTextExtractor extends FileTextExtractor
         }
 
         try {
-            $path = $this->getPathFromFile($file);
-            $request = $client
-                ->post($baseUrl)
-                ->addPostFields(['extractOnly' => 'true', 'extractFormat' => 'text'])
-                ->addPostFiles(['myfile' => $path]);
-            $response = $request->send();
+            $stream = $file instanceof File ? $file->getStream() : fopen($file, 'r');
+            /** @var Response $response */
+            $response = $client
+                ->post($baseUrl, [
+                    'multipart' => [
+                        ['name' => 'extractOnly', 'contents' => 'true'],
+                        ['name' => 'extractFormat', 'contents' => 'text'],
+                        ['name' => 'myfile', 'contents' => $stream],
+                    ]
+                ]);
         } catch (InvalidArgumentException $e) {
             $msg = sprintf(
                 'Error extracting text from "%s" (message: %s)',
@@ -133,25 +138,20 @@ class SolrCellTextExtractor extends FileTextExtractor
                 $e->getMessage()
             );
             Injector::inst()->get(LoggerInterface::class)->notice($msg);
-
             return null;
         } catch (Exception $e) {
-            // Catch other errors that Tika can throw vai Guzzle but are not caught and break Solr search
+            // Catch other errors that Tika can throw via Guzzle but are not caught and break Solr search
             // query in some cases.
             $msg = sprintf(
                 'Tika server error attempting to extract from "%s" (message: %s)',
-                $path,
+                $fileName,
                 $e->getMessage()
             );
-
             Injector::inst()->get(LoggerInterface::class)->notice($msg);
-
             return null;
         }
 
-        // Just initialise it, it doesn't take much.
         $matches = [];
-
         // Use preg match to avoid SimpleXML running out of memory on large text nodes
         preg_match(
             sprintf('/\<str name\="%s"\>(.*?)\<\/str\>/s', preg_quote($fileName)),
