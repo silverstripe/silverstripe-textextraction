@@ -36,7 +36,7 @@ SilverStripe\TextExtraction\Cache\FileTextCache\Database:
 
 ## XPDF
 
-PDFs require special handling, for example through the [XPDF](http://www.foolabs.com/xpdf/)
+PDFs require special handling, for example through the [XPDF](http://www.xpdfreader.com/)
 commandline utility. Follow their installation instructions, its presence will be automatically
 detected for \*nix operating systems. You can optionally set the binary path (required for Windows) in `mysite/_config/config.yml`:
 
@@ -100,6 +100,10 @@ class MySolrIndex extends SolrIndex
 	}
 }
 ```
+
+Extractors will return content formatted with new line characters at the end of each extracted line. If you want
+this to be used in HTML content it may be worth wrapping the result in a `nl2br()` call before using it in your
+code.
 
 Note: This isn't a terribly efficient way to process large amounts of files, since
 each HTTP request is run synchronously.

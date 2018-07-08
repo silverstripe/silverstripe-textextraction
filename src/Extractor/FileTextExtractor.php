@@ -76,13 +76,21 @@ abstract class FileTextExtractor
     /**
      * Given a File object, decide which extractor instance to use to handle it
      *
-     * @param File $file
+     * @param File|string $file
      * @return FileTextExtractor|null
      */
-    public static function for_file(File $file)
+    public static function for_file($file)
     {
-        if (!$file) {
+        if (!$file || (is_string($file) && !file_exists($file))) {
             return null;
+        }
+
+        // Ensure we have a File instance to work with
+        if (is_string($file)) {
+            /** @var File $fileObject */
+            $fileObject = File::create();
+            $fileObject->setFromLocalFile($file);
+            $file = $fileObject;
         }
 
         $extension = $file->getExtension();
@@ -116,7 +124,7 @@ abstract class FileTextExtractor
      * @return string
      * @throws Exception
      */
-    protected function getPathFromFile(File $file)
+    protected static function getPathFromFile(File $file)
     {
         $path = tempnam(TEMP_PATH, 'pdftextextractor_');
         if (false === $path) {

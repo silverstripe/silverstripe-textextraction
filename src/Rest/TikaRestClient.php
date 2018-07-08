@@ -4,7 +4,9 @@ namespace SilverStripe\TextExtraction\Rest;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Psr7\Response;
 use Psr\Log\LoggerInterface;
+use SilverStripe\Core\Convert;
 use SilverStripe\Core\Environment;
 use SilverStripe\Core\Injector\Injector;
 
@@ -38,6 +40,8 @@ class TikaRestClient extends Client
             ];
         }
 
+        $config['base_uri'] = $baseUrl;
+
         parent::__construct($config);
     }
 
@@ -49,11 +53,10 @@ class TikaRestClient extends Client
     public function isAvailable()
     {
         try {
-            $result = $this->get(null);
-            $result->setAuth($this->options['username'], $this->options['password']);
-            $result->send();
+            /** @var Response $result */
+            $result = $this->get('/', $this->getGuzzleOptions());
 
-            if ($result->getResponse()->getStatusCode() == 200) {
+            if ($result->getStatusCode() == 200) {
                 return true;
             }
         } catch (RequestException $ex) {
@@ -71,14 +74,13 @@ class TikaRestClient extends Client
      */
     public function getVersion()
     {
-        $response = $this->get('version');
-        $response->setAuth($this->options['username'], $this->options['password']);
-        $response->send();
+        /** @var Response $response */
+        $response = $this->get('version', $this->getGuzzleOptions());
         $version = 0.0;
 
         // Parse output
-        if ($response->getResponse()->getStatusCode() == 200 &&
-            preg_match('/Apache Tika (?<version>[\.\d]+)/', $response->getResponse()->getBody(), $matches)
+        if ($response->getStatusCode() == 200
+            && preg_match('/Apache Tika (?<version>[\.\d]+)/', $response->getBody(), $matches)
         ) {
             $version = (float)$matches['version'];
         }
@@ -99,12 +101,14 @@ class TikaRestClient extends Client
 
         $response = $this->get(
             'mime-types',
-            array('Accept' => 'application/json')
+            $this->getGuzzleOptions([
+                'headers' => [
+                    'Accept' => 'application/json',
+                ],
+            ])
         );
-        $response->setAuth($this->options['username'], $this->options['password']);
-        $response->send();
 
-        return $this->mimes = $response->getResponse()->json();
+        return $this->mimes = Convert::json2array($response->getBody());
     }
 
     /**
@@ -118,14 +122,17 @@ class TikaRestClient extends Client
     {
         $text = null;
         try {
+            /** @var Response $response */
             $response = $this->put(
                 'tika',
-                ['Accept' => 'text/plain'],
-                file_get_contents($file)
+                $this->getGuzzleOptions([
+                    'headers' => [
+                        'Accept' => 'text/plain',
+                    ],
+                    'body' => file_get_contents($file),
+                ])
             );
-            $response->setAuth($this->options['username'], $this->options['password']);
-            $response->send();
-            $text = $response->getResponse()->getBody(true);
+            $text = $response->getBody();
         } catch (RequestException $e) {
             $msg = sprintf(
                 'TikaRestClient was not able to process %s. Response: %s %s.',
@@ -134,7 +141,7 @@ class TikaRestClient extends Client
                 $e->getResponse()->getReasonPhrase()
             );
             // Only available if tika-server was started with --includeStack
-            $body = $e->getResponse()->getBody(true);
+            $body = $e->getResponse()->getBody();
             if ($body) {
                 $msg .= ' Body: ' . $body;
             }
@@ -143,5 +150,22 @@ class TikaRestClient extends Client
         }
 
         return $text;
+    }
+
+    /**
+     * Assembles an array of request options to pass to Guzzle
+     *
+     * @param array $options Authentication (etc) will be merged into this array and returned
+     * @return array
+     */
+    protected function getGuzzleOptions($options = [])
+    {
+        if (!empty($this->options['username']) && !empty($this->options['password'])) {
+            $options['auth'] = [
+                $this->options['username'],
+                $this->options['password']
+            ];
+        }
+        return $options;
     }
 }
