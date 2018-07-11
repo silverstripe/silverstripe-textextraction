@@ -120,7 +120,7 @@ class TikaServerTextExtractor extends FileTextExtractor
      * Ensure that the version number has a major, minor and patch number
      * Reason being that version_compare('1.7', '1.7.0') will return -1 instead of 0
      *
-     * @param $version
+     * @param float $version
      * @return string
      */
     protected function normaliseVersion($version)
