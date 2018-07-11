@@ -70,9 +70,12 @@ class TikaServerTextExtractor extends FileTextExtractor
 
     public function isAvailable()
     {
+        // check for version 1.7 instead of 1.7.0, because if server returns 1.7
+        // then version_compare('1.7', '1.7.0') == -1 which is incorrect
+        // however, if server returns 1.7.0 then version_compare('1.7.0', '1.7') == 1 which is ok
         return $this->getServerEndpoint() &&
             $this->getClient()->isAvailable() &&
-            version_compare($this->getVersion(), '1.7.0') >= 0;
+            version_compare($this->getVersion(), '1.7') >= 0;
     }
 
     public function supportsExtension($extension)
