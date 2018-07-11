@@ -57,13 +57,13 @@ class TikaTextExtractorTest extends SapphireTest
     
     protected function versionProvider()
     {
-        return [
-            ['1.7.1', '1.7.1'],
-            ['1.7', '1.7.0'],
-            ['1', '1.0.0'],
-            [null, '0.0.0'],
-            ['v1.5', 'v1.5.0'],
-            ['carrot', 'carrot.0.0']
-        ];
+        return array(
+            array('1.7.1', '1.7.1'),
+            array('1.7', '1.7.0'),
+            array('1', '1.0.0'),
+            array(null, '0.0.0'),
+            array('v1.5', 'v1.5.0'),
+            array('carrot', 'carrot.0.0')
+        );
     }
 }
