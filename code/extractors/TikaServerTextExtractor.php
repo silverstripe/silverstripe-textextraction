@@ -71,13 +71,7 @@ class TikaServerTextExtractor extends FileTextExtractor
     public function isAvailable()
     {
         $version = $this->getVersion();
-        // ensure that the version number has a major, minor and patch number
-        // reason being that version_compare('1.7', '1.7.0') will return -1 instead of 0
-        for ($i = 0; $i < 2; $i++) {
-            if (substr_count($version, '.') < 2) {
-                $version .= '.0';
-            }
-        }
+        $version = $this->normaliseVersion($version);
         return $this->getServerEndpoint() &&
             $this->getClient()->isAvailable() &&
             version_compare($version, '1.7.0') >= 0;
@@ -120,5 +114,25 @@ class TikaServerTextExtractor extends FileTextExtractor
     public function getContent($path)
     {
         return $this->getClient()->tika($path);
+    }
+
+    /**
+     * Ensure that the version number has a major, minor and patch number
+     * Reason being that version_compare('1.7', '1.7.0') will return -1 instead of 0
+     *
+     * @param $version
+     * @return string
+     */
+    protected function normaliseVersion($version)
+    {
+        if (!$version) {
+            return '0.0.0';
+        }
+        for ($i = 0; $i < 2; $i++) {
+            if (substr_count($version, '.') < 2) {
+                $version .= '.0';
+            }
+        }
+        return $version;
     }
 }

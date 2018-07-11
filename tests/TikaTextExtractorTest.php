@@ -40,4 +40,24 @@ class TikaTextExtractorTest extends SapphireTest
         $this->assertTrue($extractor->supportsMime('text/html'));
         $this->assertFalse($extractor->supportsMime('application/not-supported'));
     }
+    public function testNormaliseVersion()
+    {
+        $extractor = new TikaServerTextExtractor();
+        $reflection = new ReflectionClass($extractor);
+        $method = $reflection->getMethod('normaliseVersion');
+        $method->setAccessible(true);
+
+        $arr = [
+            '1.7.1' => '1.7.1',
+            '1.7' => '1.7.0',
+            '1' => '1.0.0',
+            null => '0.0.0',
+            'v1.5' => 'v1.5.0',
+            'carrot' => 'carrot.0.0'
+        ];
+        foreach ($arr as $input => $expected) {
+            $actual = $method->invoke($extractor, $input);
+            $this->assertEquals($expected, $actual);
+        }
+    }
 }
