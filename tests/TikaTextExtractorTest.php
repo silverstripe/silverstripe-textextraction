@@ -40,6 +40,7 @@ class TikaTextExtractorTest extends SapphireTest
         $this->assertTrue($extractor->supportsMime('text/html'));
         $this->assertFalse($extractor->supportsMime('application/not-supported'));
     }
+    
     public function testNormaliseVersion()
     {
         $extractor = new TikaServerTextExtractor();
