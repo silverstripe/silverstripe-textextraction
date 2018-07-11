@@ -48,17 +48,22 @@ class TikaTextExtractorTest extends SapphireTest
         $method = $reflection->getMethod('normaliseVersion');
         $method->setAccessible(true);
 
-        $arr = [
-            '1.7.1' => '1.7.1',
-            '1.7' => '1.7.0',
-            '1' => '1.0.0',
-            null => '0.0.0',
-            'v1.5' => 'v1.5.0',
-            'carrot' => 'carrot.0.0'
-        ];
-        foreach ($arr as $input => $expected) {
+        foreach ($this->versionProvider() as $data) {
+            list($input, $expected) = $data;
             $actual = $method->invoke($extractor, $input);
             $this->assertEquals($expected, $actual);
         }
+    }
+    
+    protected function versionProvider()
+    {
+        return [
+            ['1.7.1', '1.7.1'],
+            ['1.7', '1.7.0'],
+            ['1', '1.0.0'],
+            [null, '0.0.0'],
+            ['v1.5', 'v1.5.0'],
+            ['carrot', 'carrot.0.0']
+        ];
     }
 }
