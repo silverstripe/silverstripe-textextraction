@@ -5,7 +5,7 @@
  * @author mstephens
  *
  */
-abstract class FileTextExtractor extends Object
+abstract class FileTextExtractor extends SS_Object
 {
     /**
      * Set priority from 0-100.
@@ -34,7 +34,7 @@ abstract class FileTextExtractor extends Object
         if (self::$sorted_extractor_classes) {
             return self::$sorted_extractor_classes;
         }
-        
+
         // Generate the sorted list of extractors on demand.
         $classes = ClassInfo::subclassesFor("FileTextExtractor");
         array_shift($classes);
@@ -108,7 +108,7 @@ abstract class FileTextExtractor extends Object
     /**
      * Checks if the extractor is supported on the current environment,
      * for example if the correct binaries or libraries are available.
-     * 
+     *
      * @return boolean
      */
     abstract public function isAvailable();
@@ -125,7 +125,7 @@ abstract class FileTextExtractor extends Object
     /**
      * Determine if this extractor suports the given mime type.
      * Will only be called if supportsExtension returns false.
-     * 
+     *
      * @param string $mime
      * @return boolean
      */
@@ -133,7 +133,7 @@ abstract class FileTextExtractor extends Object
 
     /**
      * Given a file path, extract the contents as text.
-     * 
+     *
      * @param string $path
      * @return string
      */

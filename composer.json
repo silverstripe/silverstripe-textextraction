@@ -18,7 +18,7 @@
 	"require": {
 		"php": ">=5.3.2",
 		"composer/installers": "*",
-		"silverstripe/framework": "^3.1",
+		"silverstripe/framework": "^3.7",
 		"guzzle/guzzle": "^3.9",
 		"symfony/event-dispatcher": "^2.6.0@stable",
 		"symfony/http-foundation": "^2.6.0"
