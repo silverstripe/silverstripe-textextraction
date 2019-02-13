@@ -19,6 +19,8 @@ matrix:
     - php: 7.1
       env: DB=PGSQL RECIPE_VERSION=4.2.x-dev PHPUNIT_COVERAGE_TEST=1
     - php: 7.2
+      env: DB=MYSQL RECIPE_VERSION=4.3.x-dev PHPUNIT_TEST=1
+    - php: 7.3
       env: DB=MYSQL RECIPE_VERSION=4.x-dev PHPUNIT_TEST=1
 
 before_script:
@@ -34,7 +36,7 @@ before_script:
 
   # Install composer dependencies
   - composer validate
-  - composer require --no-update silverstripe/recipe-core "$RECIPE_VERSION"
+  - composer require --no-update silverstripe/recipe-cms:"$RECIPE_VERSION"
   - if [[ $DB == PGSQL ]]; then composer require --no-update silverstripe/postgresql 2.1.x-dev; fi
   - composer install --prefer-dist --no-interaction --no-progress --no-suggest --optimize-autoloader --verbose --profile
 
