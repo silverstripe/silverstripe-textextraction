@@ -149,7 +149,7 @@ class TikaRestClient extends Client
             Injector::inst()->get(LoggerInterface::class)->info($msg);
         }
 
-        return $text;
+        return (string) $text;
     }
 
     /**
