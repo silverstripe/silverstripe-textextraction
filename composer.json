@@ -29,6 +29,12 @@
         "squizlabs/php_codesniffer": "^3",
         "phpunit/phpunit": "^5.7"
     },
+    "autoload": {
+        "psr-4": {
+            "SilverStripe\\TextExtraction\\": "src/",
+            "SilverStripe\\TextExtraction\\Tests\\": "tests/"
+        }
+    },
     "suggest": {
         "ext-fileinfo": "Improved support for file mime detection"
     },
