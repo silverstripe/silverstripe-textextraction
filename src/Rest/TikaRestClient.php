@@ -70,22 +70,22 @@ class TikaRestClient extends Client
     /**
      * Get version code
      *
-     * @return float
+     * @return string
      */
     public function getVersion()
     {
         /** @var Response $response */
         $response = $this->get('version', $this->getGuzzleOptions());
-        $version = 0.0;
+        $version = 0;
 
         // Parse output
         if ($response->getStatusCode() == 200
             && preg_match('/Apache Tika (?<version>[\.\d]+)/', $response->getBody(), $matches)
         ) {
-            $version = (float)$matches['version'];
+            $version = $matches['version'];
         }
 
-        return $version;
+        return (string) $version;
     }
 
     /**
