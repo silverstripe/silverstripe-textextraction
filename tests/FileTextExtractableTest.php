@@ -26,15 +26,16 @@ class FileTextExtractableTest extends SapphireTest
         // Create a copy of the file, as it may be clobbered by the test
         // ($file->extractFileAsText() calls $file->write)
         copy(BASE_PATH.'/textextraction/tests/fixtures/test1.html', BASE_PATH.'/textextraction/tests/fixtures/test1-copy.html');
-        
+
         // Use HTML, since the extractor is always available
+        /** @var File&FileTextExtractable $file */
         $file = new File(array(
             'Name' => 'test1-copy.html',
             'Filename' => 'textextraction/tests/fixtures/test1-copy.html'
         ));
         $file->write();
-    
-        $content = $file->extractFileAsText();
+
+        $content = (string) $file->extractFileAsText();
         $this->assertContains('Test Headline', $content);
         $this->assertContains('Test Text', $content);
         $this->assertEquals($content, $file->FileContentCache);
