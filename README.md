@@ -25,14 +25,16 @@ The module supports text extraction on the following file formats:
 
 ## Requirements
 
- * SilverStripe ^3.1
+ * SilverStripe ^3.7
+   * For SilverStripe 4 support, use silverstripe/textextraction ^3.0
+   * For SIlverStripe 3.1-3.7 support, use silverstripe/textextraction ~2.1.0
  * (optional) [XPDF](http://www.foolabs.com/xpdf/) (`pdftotext` utility)
  * (optional) [Apache Solr with ExtracingRequestHandler](http://wiki.apache.org/solr/ExtractingRequestHandler)
  * (optional) [Apache Tika](http://tika.apache.org/)
 
 ## Installation
 
-```js
+```
 composer require silverstripe/textextraction
 ```
 
