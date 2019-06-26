@@ -81,7 +81,7 @@ class TikaTextExtractor extends FileTextExtractor
         $command = sprintf('tika %s %s', $mode, escapeshellarg($path));
         $code = $this->runShell($command, $output);
         //Cleanup temp file
-        if ($path instanceof File) {
+        if ($file instanceof File) {
             unlink($path);
         }
 

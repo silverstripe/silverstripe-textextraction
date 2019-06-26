@@ -129,7 +129,7 @@ class TikaServerTextExtractor extends FileTextExtractor
         $tempFile = $file instanceof File ? $this->getPathFromFile($file) : $file;
         $content = $this->getClient()->tika($tempFile);
         //Cleanup temp file
-        if ($tempFile instanceof File) {
+        if ($file instanceof File) {
             unlink($tempFile);
         }
         return $content;
