@@ -5,6 +5,7 @@ namespace SilverStripe\TextExtraction\Tests;
 use SilverStripe\Assets\File;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Dev\SapphireTest;
+use SilverStripe\TextExtraction\Cache\FileTextCache;
 use SilverStripe\TextExtraction\Extension\FileTextExtractable;
 
 class FileTextExtractableTest extends SapphireTest
@@ -44,8 +45,9 @@ class FileTextExtractableTest extends SapphireTest
     public function testExtractFileAsText()
     {
         // Use HTML, since the extractor is always available
-        /** @var File|FileTextExtractable $file */
+        /** @var File&FileTextExtractable $file */
         $file = new File(['Name' => 'test1-copy.html']);
+        $file->setTextCache(new FileTextCache\Database());
         $file->setFromLocalFile(dirname(__FILE__) . '/fixtures/test1-copy.html');
         $file->write();
 
