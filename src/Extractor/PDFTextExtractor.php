@@ -109,16 +109,12 @@ class PDFTextExtractor extends FileTextExtractor
 
         $path = $file instanceof File ? $this->getPathFromFile($file) : $file;
         exec(sprintf('%s %s - 2>&1', $this->bin('pdftotext'), escapeshellarg($path)), $content, $err);
-        if ($err) {
-            if (!is_array($err) && $err == 1) {
-                // For Windows compatibility
-                $err = $content;
-            }
 
+        if ($err) {
             throw new Exception(sprintf(
                 'PDFTextExtractor->getContent() failed for %s: %s',
                 $path,
-                implode(PHP_EOL, $err)
+                implode(PHP_EOL, $content)
             ));
         }
 
