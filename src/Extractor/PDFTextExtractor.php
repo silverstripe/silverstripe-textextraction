@@ -118,7 +118,7 @@ class PDFTextExtractor extends FileTextExtractor
             throw new Exception(sprintf(
                 'PDFTextExtractor->getContent() failed for %s: %s',
                 $path,
-                implode(PHP_EOL, $err)
+                implode(PHP_EOL, $content)
             ));
         }
 
