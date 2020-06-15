@@ -9,7 +9,7 @@ addons:
 
 env:
   global:
-    - COMPOSER_ROOT_VERSION=3.x-dev
+    - COMPOSER_ROOT_VERSION=3.1.x-dev
     - SS_TIKA_ENDPOINT="http://localhost:9998/"
 
 matrix:
