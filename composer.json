@@ -38,11 +38,7 @@
     "suggest": {
         "ext-fileinfo": "Improved support for file mime detection"
     },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "3.x-dev"
-        }
-    },
+    "extra": [],
     "minimum-stability": "dev",
     "prefer-stable": true
 }
