@@ -28,7 +28,7 @@ class TikaTextExtractorTest extends SapphireTest
         $file->write();
 
         $content = $extractor->getContent($file);
-        $this->assertContains('This is a test file with a link', $content);
+        $this->assertStringContainsString('This is a test file with a link', $content);
 
         // Check mime validation
         $this->assertTrue($extractor->supportsMime('application/pdf'));

@@ -18,7 +18,7 @@ class FileTextExtractableTest extends SapphireTest
         ],
     ];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -33,7 +33,7 @@ class FileTextExtractableTest extends SapphireTest
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if (file_exists(dirname(__FILE__) . '/fixtures/test1-copy.html')) {
             unlink(dirname(__FILE__) . '/fixtures/test1-copy.html');
@@ -53,8 +53,8 @@ class FileTextExtractableTest extends SapphireTest
 
         $content = $file->extractFileAsText();
         $this->assertNotNull($content);
-        $this->assertContains('Test Headline', $content);
-        $this->assertContains('Test Text', $content);
+        $this->assertStringContainsString('Test Headline', $content);
+        $this->assertStringContainsString('Test Text', $content);
         $this->assertEquals($content, $file->FileContentCache);
     }
 }

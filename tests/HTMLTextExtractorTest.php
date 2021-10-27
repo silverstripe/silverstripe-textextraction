@@ -11,7 +11,7 @@ class HTMLTextExtractorTest extends SapphireTest
 {
     protected $usesDatabase = true;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -28,9 +28,9 @@ class HTMLTextExtractorTest extends SapphireTest
 
         $content = $extractor->getContent($file);
 
-        $this->assertContains('Test Headline', $content);
-        $this->assertNotContains('Test Comment', $content, 'Strips HTML comments');
-        $this->assertNotContains('Test Style', $content, 'Strips non-content style tags');
-        $this->assertNotContains('Test Script', $content, 'Strips non-content script tags');
+        $this->assertStringContainsString('Test Headline', $content);
+        $this->assertStringNotContainsString('Test Comment', $content, 'Strips HTML comments');
+        $this->assertStringNotContainsString('Test Style', $content, 'Strips non-content style tags');
+        $this->assertStringNotContainsString('Test Script', $content, 'Strips non-content script tags');
     }
 }
