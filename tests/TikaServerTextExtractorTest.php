@@ -2,7 +2,7 @@
 
 namespace SilverStripe\TextExtraction\Tests;
 
-use PHPUnit_Framework_MockObject_MockObject;
+use PHPUnit\Framework\MockObject\MockObject;
 use SilverStripe\Assets\File;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\TextExtraction\Extractor\TikaServerTextExtractor;
@@ -28,7 +28,7 @@ class TikaServerTextExtractorTest extends SapphireTest
         $file->write();
 
         $content = $extractor->getContent($file);
-        $this->assertContains('This is a test file with a link', $content);
+        $this->assertStringContainsString('This is a test file with a link', $content);
 
         // Check mime validation
         $this->assertTrue($extractor->supportsMime('application/pdf'));
@@ -43,7 +43,7 @@ class TikaServerTextExtractorTest extends SapphireTest
      */
     public function testIsAvailable($version, $expected)
     {
-        /** @var PHPUnit_Framework_MockObject_MockObject|TikaServerTextExtractor $extractor */
+        /** @var MockObject|TikaServerTextExtractor $extractor */
         $extractor = $this->getMockBuilder(TikaServerTextExtractor::class)
             ->setMethods(['getClient', 'getServerEndpoint'])
             ->getMock();
