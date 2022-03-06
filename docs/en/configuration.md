@@ -30,7 +30,7 @@ SilverStripe\Core\Injector\Injector:
   SilverStripe\TextExtraction\Cache\FileTextCache:
     class: SilverStripe\TextExtraction\Cache\FileTextCache\Cache
 
-SilverStripe\TextExtraction\Cache\FileTextCache\Database:
+SilverStripe\TextExtraction\Cache\FileTextCache\Cache:
   lifetime: 3600 # Number of seconds to cache content for
 ```
 
