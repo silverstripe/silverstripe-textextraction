@@ -18,7 +18,7 @@ class Cache implements FileTextCache, Flushable
 
     /**
      * Lifetime of cache in seconds
-     * Null is indefinite
+     * Null defaults to 3600 (1 hour)
      *
      * @var int|null
      * @config
