@@ -86,7 +86,7 @@ class TikaServerTextExtractor extends FileTextExtractor
     {
         return $this->getServerEndpoint()
             && $this->getClient()->isAvailable()
-            && version_compare($this->getVersion(), '1.7') >= 0;
+            && version_compare($this->getVersion() ?? '', '1.7') >= 0;
     }
 
     /**
@@ -116,7 +116,7 @@ class TikaServerTextExtractor extends FileTextExtractor
 
         // Check aliases
         foreach ($this->supportedMimes as $info) {
-            if (isset($info['alias']) && in_array($mime, $info['alias'])) {
+            if (isset($info['alias']) && in_array($mime, $info['alias'] ?? [])) {
                 return true;
             }
         }
@@ -130,7 +130,7 @@ class TikaServerTextExtractor extends FileTextExtractor
         $content = $this->getClient()->tika($tempFile);
         //Cleanup temp file
         if ($file instanceof File) {
-            unlink($tempFile);
+            unlink($tempFile ?? '');
         }
         return $content;
     }

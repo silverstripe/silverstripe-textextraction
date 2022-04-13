@@ -80,7 +80,7 @@ class TikaRestClient extends Client
 
         // Parse output
         if ($response->getStatusCode() == 200
-            && preg_match('/Apache Tika (?<version>[\.\d]+)/', $response->getBody(), $matches)
+            && preg_match('/Apache Tika (?<version>[\.\d]+)/', $response->getBody() ?? '', $matches)
         ) {
             $version = $matches['version'];
         }
@@ -129,7 +129,7 @@ class TikaRestClient extends Client
                     'headers' => [
                         'Accept' => 'text/plain',
                     ],
-                    'body' => file_get_contents($file),
+                    'body' => file_get_contents($file ?? ''),
                 ])
             );
             $text = $response->getBody();

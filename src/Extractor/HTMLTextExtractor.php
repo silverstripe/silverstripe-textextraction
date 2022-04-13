@@ -34,7 +34,7 @@ class HTMLTextExtractor extends FileTextExtractor
      */
     public function supportsExtension($extension)
     {
-        return in_array(strtolower($extension), ["html", "htm", "xhtml"]);
+        return in_array(strtolower($extension ?? ''), ["html", "htm", "xhtml"]);
     }
 
     /**
@@ -43,7 +43,7 @@ class HTMLTextExtractor extends FileTextExtractor
      */
     public function supportsMime($mime)
     {
-        return strtolower($mime) === 'text/html';
+        return strtolower($mime ?? '') === 'text/html';
     }
 
     /**
@@ -56,7 +56,7 @@ class HTMLTextExtractor extends FileTextExtractor
      */
     public function getContent($file)
     {
-        $content = $file instanceof File ? $file->getString() : file_get_contents($file);
+        $content = $file instanceof File ? $file->getString() : file_get_contents($file ?? '');
 
         // Yes, yes, regex'ing HTML is evil.
         // Since we don't care about well-formedness or markup here, it does the job.
@@ -82,9 +82,9 @@ class HTMLTextExtractor extends FileTextExtractor
                 '@</?((frameset)|(frame)|(iframe))@iu',
             ],
             [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', "$0", "$0", "$0", "$0", "$0", "$0", "$0", "$0"],
-            $content
+            $content ?? ''
         );
 
-        return strip_tags($content);
+        return strip_tags($content ?? '');
     }
 }
