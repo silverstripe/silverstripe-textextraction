@@ -33,18 +33,18 @@ class PDFTextExtractor extends FileTextExtractor
     public function isAvailable()
     {
         $bin = $this->bin('pdftotext');
-        return $bin && file_exists($bin) && is_executable($bin);
+        return $bin && file_exists($bin ?? '') && is_executable($bin ?? '');
     }
 
     public function supportsExtension($extension)
     {
-        return strtolower($extension) === 'pdf';
+        return strtolower($extension ?? '') === 'pdf';
     }
 
     public function supportsMime($mime)
     {
         return in_array(
-            strtolower($mime),
+            strtolower($mime ?? ''),
             [
                 'application/pdf',
                 'application/x-pdf',
@@ -72,7 +72,7 @@ class PDFTextExtractor extends FileTextExtractor
         // Find program in each path
         foreach ($locations as $location) {
             $path = "{$location}/{$program}";
-            if (file_exists($path)) {
+            if (file_exists($path ?? '')) {
                 return $path;
             }
             if (file_exists($path . '.exe')) {
@@ -86,7 +86,7 @@ class PDFTextExtractor extends FileTextExtractor
 
     public function getContent($file)
     {
-        if (!$file || (is_string($file) && !file_exists($file))) {
+        if (!$file || (is_string($file) && !file_exists($file ?? ''))) {
             // no file
             return '';
         }
@@ -108,7 +108,7 @@ class PDFTextExtractor extends FileTextExtractor
         }
 
         $path = $file instanceof File ? $this->getPathFromFile($file) : $file;
-        exec(sprintf('%s %s - 2>&1', $this->bin('pdftotext'), escapeshellarg($path)), $content, $err);
+        exec(sprintf('%s %s - 2>&1', $this->bin('pdftotext'), escapeshellarg($path ?? '')), $content, $err);
 
         if ($err) {
             throw new Exception(sprintf(
@@ -141,6 +141,6 @@ class PDFTextExtractor extends FileTextExtractor
             'ﬆ' => 'st'
         ];
 
-        return str_replace(array_keys($mapping), array_values($mapping), $input);
+        return str_replace(array_keys($mapping ?? []), array_values($mapping ?? []), $input ?? '');
     }
 }

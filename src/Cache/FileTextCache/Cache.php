@@ -42,7 +42,7 @@ class Cache implements FileTextCache, Flushable
      */
     protected function getKey(File $file)
     {
-        return md5($file->getFilename());
+        return md5($file->getFilename() ?? '');
     }
 
     /**

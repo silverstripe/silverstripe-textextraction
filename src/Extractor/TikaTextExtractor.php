@@ -29,7 +29,7 @@ class TikaTextExtractor extends FileTextExtractor
         $code = $this->runShell('tika --version', $stdout);
 
         // Parse output
-        if (!$code && preg_match('/Apache Tika (?<version>[\.\d]+)/', $stdout, $matches)) {
+        if (!$code && preg_match('/Apache Tika (?<version>[\.\d]+)/', $stdout ?? '', $matches)) {
             return $matches['version'];
         }
 
@@ -54,14 +54,14 @@ class TikaTextExtractor extends FileTextExtractor
         ];
         // Invoke command
         $pipes = [];
-        $proc = proc_open($command, $descriptorSpecs, $pipes);
+        $proc = proc_open($command ?? '', $descriptorSpecs ?? [], $pipes);
 
         if (!is_resource($proc)) {
             return 255;
         }
 
         // Send content as input
-        fwrite($pipes[0], $input);
+        fwrite($pipes[0], $input ?? '');
         fclose($pipes[0]);
 
         // Get output
@@ -78,11 +78,11 @@ class TikaTextExtractor extends FileTextExtractor
     {
         $mode = $this->config()->get('output_mode');
         $path = $file instanceof File ? $this->getPathFromFile($file) : $file;
-        $command = sprintf('tika %s %s', $mode, escapeshellarg($path));
+        $command = sprintf('tika %s %s', $mode, escapeshellarg($path ?? ''));
         $code = $this->runShell($command, $output);
         //Cleanup temp file
         if ($file instanceof File) {
-            unlink($path);
+            unlink($path ?? '');
         }
 
         if ($code == 0) {
@@ -123,8 +123,8 @@ class TikaTextExtractor extends FileTextExtractor
         }
 
         // Check if the mime type is inside the result
-        $pattern = sprintf('/\b(%s)\b/', preg_quote($mime, '/'));
+        $pattern = sprintf('/\b(%s)\b/', preg_quote($mime ?? '', '/'));
 
-        return (bool)preg_match($pattern, $supportedTypes);
+        return (bool)preg_match($pattern ?? '', $supportedTypes ?? '');
     }
 }

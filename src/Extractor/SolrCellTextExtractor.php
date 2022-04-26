@@ -80,7 +80,7 @@ class SolrCellTextExtractor extends FileTextExtractor
     public function supportsExtension($extension)
     {
         return in_array(
-            strtolower($extension),
+            strtolower($extension ?? ''),
             [
                 'pdf', 'doc', 'docx', 'xls', 'xlsx',
                 'epub', 'rtf', 'odt', 'fodt', 'ods', 'fods',
@@ -106,12 +106,12 @@ class SolrCellTextExtractor extends FileTextExtractor
      */
     public function getContent($file)
     {
-        if (!$file || (is_string($file) && !file_exists($file))) {
+        if (!$file || (is_string($file) && !file_exists($file ?? ''))) {
             // no file
             return '';
         }
 
-        $fileName = $file instanceof File ? $file->getFilename() : basename($file);
+        $fileName = $file instanceof File ? $file->getFilename() : basename($file ?? '');
         $client = $this->getHttpClient();
 
         // Get and validate base URL
@@ -121,7 +121,7 @@ class SolrCellTextExtractor extends FileTextExtractor
         }
 
         try {
-            $stream = $file instanceof File ? $file->getStream() : fopen($file, 'r');
+            $stream = $file instanceof File ? $file->getStream() : fopen($file ?? '', 'r');
             /** @var Response $response */
             $response = $client
                 ->post($baseUrl, [
@@ -154,7 +154,7 @@ class SolrCellTextExtractor extends FileTextExtractor
         $matches = [];
         // Use preg match to avoid SimpleXML running out of memory on large text nodes
         preg_match(
-            sprintf('/\<str name\="%s"\>(.*?)\<\/str\>/s', preg_quote($fileName)),
+            sprintf('/\<str name\="%s"\>(.*?)\<\/str\>/s', preg_quote($fileName ?? '')),
             (string)$response->getBody(),
             $matches
         );

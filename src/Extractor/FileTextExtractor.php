@@ -58,7 +58,7 @@ abstract class FileTextExtractor
         arsort($classPriorities);
 
         // Save classes
-        $sortedClasses = array_keys($classPriorities);
+        $sortedClasses = array_keys($classPriorities ?? []);
         return self::$sorted_extractor_classes = $sortedClasses;
     }
 
@@ -81,7 +81,7 @@ abstract class FileTextExtractor
      */
     public static function for_file($file)
     {
-        if (!$file || (is_string($file) && !file_exists($file))) {
+        if (!$file || (is_string($file) && !file_exists($file ?? ''))) {
             return null;
         }
 
@@ -137,11 +137,11 @@ abstract class FileTextExtractor
         }
 
         // Remove any existing temp files with this name
-        if (file_exists($path)) {
-            unlink($path);
+        if (file_exists($path ?? '')) {
+            unlink($path ?? '');
         }
 
-        $bytesWritten = file_put_contents($path, $file->getStream());
+        $bytesWritten = file_put_contents($path ?? '', $file->getStream());
         if (false === $bytesWritten) {
             throw new Exception(static::class . '->getPathFromFile() failed to write temporary file');
         }
