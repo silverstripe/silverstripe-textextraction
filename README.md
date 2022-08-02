@@ -1,9 +1,7 @@
 # Text extraction module
 
 [![CI](https://github.com/silverstripe/silverstripe-textextraction/actions/workflows/ci.yml/badge.svg)](https://github.com/silverstripe/silverstripe-textextraction/actions/workflows/ci.yml)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/silverstripe/silverstripe-textextraction/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/silverstripe/silverstripe-textextraction/?branch=master)
-[![codecov](https://codecov.io/gh/silverstripe/silverstripe-textextraction/branch/master/graph/badge.svg)](https://codecov.io/gh/silverstripe/silverstripe-textextraction)
-[![SilverStripe supported module](https://img.shields.io/badge/silverstripe-supported-0071C4.svg)](https://www.silverstripe.org/software/addons/silverstripe-commercially-supported-module-list/)
+[![Silverstripe supported module](https://img.shields.io/badge/silverstripe-supported-0071C4.svg)](https://www.silverstripe.org/software/addons/silverstripe-commercially-supported-module-list/)
 
 Provides a text extraction API for file content, that can hook into different extractor
 engines based on availability and the parsed file format. The output returned is always a string of the file content.
@@ -24,7 +22,7 @@ The module supports text extraction on the following file formats:
 
 ## Requirements
 
- * SilverStripe ^4.0
+ * Silverstripe ^4.0
  * (optional) [XPDF](http://www.foolabs.com/xpdf/) (`pdftotext` utility)
  * (optional) [Apache Solr with ExtracingRequestHandler](http://wiki.apache.org/solr/ExtractingRequestHandler)
  * (optional) [Apache Tika](http://tika.apache.org/)
@@ -54,8 +52,8 @@ If the issue does look like a new bug:
  - Create a new issue
  - Describe the steps required to reproduce your issue, and the expected outcome. Unit tests, screenshots
   and screencasts can help here.
- - Describe your environment as detailed as possible: SilverStripe version, Browser, PHP version,
- Operating System, any installed SilverStripe modules.
+ - Describe your environment as detailed as possible: Silverstripe version, Browser, PHP version,
+ Operating System, any installed Silverstripe modules.
 
 Please report security issues to security@silverstripe.org directly. Please don't file security issues in the bugtracker.
 
