@@ -108,7 +108,7 @@ class TikaRestClient extends Client
             ])
         );
 
-        return $this->mimes = Convert::json2array($response->getBody());
+        return $this->mimes = json_decode($response->getBody(), true);
     }
 
     /**
