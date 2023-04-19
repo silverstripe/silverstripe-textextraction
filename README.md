@@ -20,22 +20,11 @@ The module supports text extraction on the following file formats:
  * EPub (Solr)
  * Many others (Tika)
 
-## Requirements
-
- * Silverstripe ^4.0
- * (optional) [XPDF](http://www.foolabs.com/xpdf/) (`pdftotext` utility)
- * (optional) [Apache Solr with ExtracingRequestHandler](http://wiki.apache.org/solr/ExtractingRequestHandler)
- * (optional) [Apache Tika](http://tika.apache.org/)
-
 ## Installation
 
-```
+```sh
 composer require silverstripe/textextraction
 ```
-
-The module depends on the [Guzzle HTTP Library](http://guzzlephp.org),
-which is automatically checked out by composer. Alternatively, install Guzzle
-through PEAR and ensure its in your `include_path`.
 
 ## Documentation
 
