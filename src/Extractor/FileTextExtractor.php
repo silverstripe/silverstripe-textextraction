@@ -87,7 +87,6 @@ abstract class FileTextExtractor
 
         // Ensure we have a File instance to work with
         if (is_string($file)) {
-            /** @var File $fileObject */
             $fileObject = File::create();
             $fileObject->setFromLocalFile($file);
             $file = $fileObject;

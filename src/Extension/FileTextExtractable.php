@@ -14,6 +14,8 @@ use SilverStripe\TextExtraction\Extractor\FileTextExtractor;
  * Adds an additional property which is the cached contents, which is populated on demand.
  *
  * @author mstephens
+ *
+ * @extends DataExtension<File>
  */
 class FileTextExtractable extends DataExtension
 {
@@ -85,7 +87,6 @@ class FileTextExtractable extends DataExtension
      */
     public function extractFileAsText($disableCache = false)
     {
-        /** @var File $file */
         $file = $this->owner;
         if (!$disableCache) {
             $text = $this->getTextCache()->load($file);
