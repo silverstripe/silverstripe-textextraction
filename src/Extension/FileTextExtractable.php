@@ -116,7 +116,7 @@ class FileTextExtractable extends DataExtension
     /**
      * @return void
      */
-    public function onBeforeWrite()
+    protected function onBeforeWrite()
     {
         // Clear cache before changing file
         $this->getTextCache()->invalidate($this->owner);
