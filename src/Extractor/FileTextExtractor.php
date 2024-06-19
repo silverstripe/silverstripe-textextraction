@@ -43,8 +43,8 @@ abstract class FileTextExtractor
     protected static function get_extractor_classes()
     {
         // Check cache
-        if (self::$sorted_extractor_classes) {
-            return self::$sorted_extractor_classes;
+        if (FileTextExtractor::$sorted_extractor_classes) {
+            return FileTextExtractor::$sorted_extractor_classes;
         }
 
         // Generate the sorted list of extractors on demand.
@@ -59,7 +59,7 @@ abstract class FileTextExtractor
 
         // Save classes
         $sortedClasses = array_keys($classPriorities ?? []);
-        return self::$sorted_extractor_classes = $sortedClasses;
+        return FileTextExtractor::$sorted_extractor_classes = $sortedClasses;
     }
 
     /**
@@ -95,8 +95,8 @@ abstract class FileTextExtractor
         $extension = $file->getExtension();
         $mime = $file->getMimeType();
 
-        foreach (self::get_extractor_classes() as $className) {
-            $extractor = self::get_extractor($className);
+        foreach (FileTextExtractor::get_extractor_classes() as $className) {
+            $extractor = FileTextExtractor::get_extractor($className);
 
             // Skip unavailable extractors
             if (!$extractor->isAvailable()) {

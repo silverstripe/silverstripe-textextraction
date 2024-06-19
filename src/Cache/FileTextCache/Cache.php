@@ -53,7 +53,7 @@ class Cache implements FileTextCache, Flushable
     public function load(File $file)
     {
         $key = $this->getKey($file);
-        $cache = self::get_cache();
+        $cache = Cache::get_cache();
 
         return $cache->get($key);
     }
@@ -67,7 +67,7 @@ class Cache implements FileTextCache, Flushable
     {
         $lifetime = $this->config()->get('lifetime') ?: 3600;
         $key = $this->getKey($file);
-        $cache = self::get_cache();
+        $cache = Cache::get_cache();
 
         return $cache->set($key, $content, $lifetime);
     }
@@ -77,7 +77,7 @@ class Cache implements FileTextCache, Flushable
      */
     public static function flush()
     {
-        $cache = self::get_cache();
+        $cache = Cache::get_cache();
         $cache->clear();
     }
 
@@ -88,7 +88,7 @@ class Cache implements FileTextCache, Flushable
      */
     public static function clear()
     {
-        $cache = self::get_cache();
+        $cache = Cache::get_cache();
         $cache->clear();
     }
 
@@ -100,7 +100,7 @@ class Cache implements FileTextCache, Flushable
     public function invalidate(File $file)
     {
         $key = $this->getKey($file);
-        $cache = self::get_cache();
+        $cache = Cache::get_cache();
 
         return $cache->delete($key);
     }
