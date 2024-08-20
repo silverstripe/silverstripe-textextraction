@@ -3,7 +3,7 @@
 namespace SilverStripe\TextExtraction\Extension;
 
 use SilverStripe\Assets\File;
-use SilverStripe\ORM\DataExtension;
+use SilverStripe\Core\Extension;
 use SilverStripe\TextExtraction\Cache\FileTextCache;
 use SilverStripe\TextExtraction\Extractor\FileTextExtractor;
 
@@ -15,9 +15,9 @@ use SilverStripe\TextExtraction\Extractor\FileTextExtractor;
  *
  * @author mstephens
  *
- * @extends DataExtension<File>
+ * @extends Extension<File>
  */
-class FileTextExtractable extends DataExtension
+class FileTextExtractable extends Extension
 {
     /**
      * @var array
