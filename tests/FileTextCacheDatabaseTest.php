@@ -14,7 +14,7 @@ class FileTextCacheDatabaseTest extends SapphireTest
         Config::modify()->set(Database::class, 'max_content_length', 5);
 
         $cache = new Database();
-        $file = $this->getMockBuilder(File::class)->setMethods(['write'])->getMock();
+        $file = $this->getMockBuilder(File::class)->onlyMethods(['write'])->getMock();
         $content = '0123456789';
         $cache->save($file, $content);
 

@@ -7,6 +7,7 @@ use SilverStripe\Assets\File;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\TextExtraction\Extractor\TikaServerTextExtractor;
 use SilverStripe\TextExtraction\Rest\TikaRestClient;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * @group tika-tests
@@ -39,13 +40,13 @@ class TikaServerTextExtractorTest extends SapphireTest
     /**
      * @param string $version
      * @param bool $expected
-     * @dataProvider isAvailableProvider
      */
+    #[DataProvider('isAvailableProvider')]
     public function testIsAvailable($version, $expected)
     {
         /** @var MockObject|TikaServerTextExtractor $extractor */
         $extractor = $this->getMockBuilder(TikaServerTextExtractor::class)
-            ->setMethods(['getClient', 'getServerEndpoint'])
+            ->onlyMethods(['getClient', 'getServerEndpoint'])
             ->getMock();
 
         $client = $this->createMock(TikaRestClient::class);
@@ -62,7 +63,7 @@ class TikaServerTextExtractorTest extends SapphireTest
     /**
      * @return array[]
      */
-    public function isAvailableProvider()
+    public static function isAvailableProvider()
     {
         return [
             ['1.5.2', false],
