@@ -9,9 +9,6 @@ use SilverStripe\TextExtraction\Extractor\TikaServerTextExtractor;
 use SilverStripe\TextExtraction\Rest\TikaRestClient;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-/**
- * @group tika-tests
- */
 class TikaServerTextExtractorTest extends SapphireTest
 {
     protected $usesDatabase = true;
