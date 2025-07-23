@@ -20,16 +20,13 @@ The module supports text extraction on the following file formats:
  * EPub (Solr)
  * Many others (Tika)
 
+Read more in the [documentation](https://docs.silverstripe.org/en/optional_features/text-extraction).
+
 ## Installation
 
 ```sh
 composer require silverstripe/textextraction
 ```
-
-## Documentation
-
- * [Configuration](docs/en/configuration.md)
- * [Developer documentation](/docs/en/developer-docs.md)
 
 ## Bugtracker
 
