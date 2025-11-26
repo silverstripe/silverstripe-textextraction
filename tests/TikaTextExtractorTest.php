@@ -8,8 +8,6 @@ use SilverStripe\TextExtraction\Extractor\TikaTextExtractor;
 
 /**
  * Tests the {@see TikaTextExtractor} class
- *
- * @group tika-tests
  */
 class TikaTextExtractorTest extends SapphireTest
 {
