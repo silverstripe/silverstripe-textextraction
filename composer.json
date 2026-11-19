@@ -21,9 +21,9 @@
     ],
     "require": {
         "php": "^8.3",
-        "silverstripe/framework": "^6",
-        "silverstripe/assets": "^3",
-        "silverstripe/versioned": "^3",
+        "silverstripe/framework": "^7",
+        "silverstripe/assets": "^4",
+        "silverstripe/versioned": "^4",
         "guzzlehttp/guzzle": "^7.9"
     },
     "require-dev": {
